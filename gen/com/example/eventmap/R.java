@@ -8,6 +8,9 @@
 package com.example.eventmap;
 
 public final class R {
+    public static final class array {
+        public static final int tags=0x7f080000;
+    }
     public static final class attr {
         /** 
     The size of the ad. It must be one of BANNER, FULL_BANNER, LEADERBOARD,
@@ -173,8 +176,8 @@ containing a value of this type.
          screen margins) for sw720dp devices (e.g. 10" tablets) in landscape here.
     
          */
-        public static final int activity_horizontal_margin=0x7f080000;
-        public static final int activity_vertical_margin=0x7f080001;
+        public static final int activity_horizontal_margin=0x7f090000;
+        public static final int activity_vertical_margin=0x7f090001;
     }
     public static final class drawable {
         public static final int common_signin_btn_icon_dark=0x7f020000;
@@ -208,19 +211,21 @@ containing a value of this type.
         public static final int ic_plusone_tall_off_client=0x7f02001c;
     }
     public static final class id {
-        public static final int action_settings=0x7f05000d;
-        public static final int dateButton=0x7f05000b;
-        public static final int dateText=0x7f05000c;
+        public static final int action_settings=0x7f05000f;
+        public static final int dateButton=0x7f05000d;
+        public static final int dateText=0x7f05000e;
         public static final int endDateButton=0x7f050007;
-        public static final int endDateText=0x7f05000a;
+        public static final int endDateText=0x7f05000b;
         public static final int hybrid=0x7f050004;
         public static final int map=0x7f050005;
         public static final int none=0x7f050000;
         public static final int normal=0x7f050001;
+        public static final int resetButton=0x7f050009;
         public static final int satellite=0x7f050002;
         public static final int searchButton=0x7f050008;
         public static final int startDateButton=0x7f050006;
-        public static final int startDateText=0x7f050009;
+        public static final int startDateText=0x7f05000a;
+        public static final int tagButton=0x7f05000c;
         public static final int terrain=0x7f050003;
     }
     public static final class integer {
@@ -231,7 +236,7 @@ containing a value of this type.
         public static final int datepicker_layout=0x7f030001;
     }
     public static final class menu {
-        public static final int map=0x7f0a0000;
+        public static final int map=0x7f0b0000;
     }
     public static final class string {
         public static final int action_settings=0x7f06001b;
@@ -259,6 +264,7 @@ containing a value of this type.
         [CHAR LIMIT=70] 
          */
         public static final int auth_client_using_bad_version_title=0x7f060014;
+        public static final int cancel=0x7f06001f;
         /**  Button in confirmation dialog to enable Google Play services.  Clicking it
         will direct user to application settings of Google Play services where they
         can enable it [CHAR LIMIT=40] 
@@ -331,6 +337,8 @@ containing a value of this type.
          */
         public static final int common_signin_button_text_long=0x7f060013;
         public static final int hello_world=0x7f06001c;
+        public static final int ok=0x7f06001e;
+        public static final int select_tags=0x7f06001d;
     }
     public static final class style {
         /** 
@@ -354,11 +362,11 @@ containing a value of this type.
     
  API 14 theme customizations can go here. 
          */
-        public static final int AppBaseTheme=0x7f090000;
+        public static final int AppBaseTheme=0x7f0a0000;
         /**  Application theme. 
  All customizations that are NOT specific to a particular API-level can go here. 
          */
-        public static final int AppTheme=0x7f090001;
+        public static final int AppTheme=0x7f0a0001;
     }
     public static final class styleable {
         /** Attributes that can be used with a AdsAttrs.

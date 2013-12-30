@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="tags"> 
+　　        	<item>Camp</item> 
+　　       	<item>Party</item> 
+		<item>Official</item> 
+　　    </string-array> 
+
+</resources>

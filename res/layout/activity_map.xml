@@ -26,6 +26,12 @@
         android:layout_height="wrap_content" 
         android:text="Search" 
         android:layout_toRightOf="@id/endDateButton"/>
+    <Button 
+        android:id="@+id/resetButton"
+        android:layout_width="wrap_content" 
+        android:layout_height="wrap_content" 
+        android:text="Reset" 
+        android:layout_toRightOf="@id/searchButton"/>
     
     <TextView  
         android:id="@+id/startDateText"
@@ -38,5 +44,12 @@
 	    android:layout_height="wrap_content" 
 	    android:layout_below="@id/endDateButton"
 	    android:layout_toRightOf="@id/startDateText"/>
-
+    
+    <Button 
+        android:id="@+id/tagButton"
+        android:layout_width="wrap_content" 
+        android:layout_height="wrap_content" 
+        android:text="Tag" 
+        android:layout_toRightOf="@id/resetButton"/>
+    
 </RelativeLayout>

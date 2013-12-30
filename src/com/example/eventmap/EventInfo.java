@@ -12,16 +12,16 @@ public class EventInfo {
 	
 	private String 	ID;
 	private String 	URL;
-	private Date 	date;
-	private Time 	time;
 	private Calendar cal;
-	private ArrayList<String> tag;
+	private ArrayList<Integer> tagList;
 
 	public EventInfo (int y, int m, int d)
 	{
 		cal = Calendar.getInstance();
-		cal.set(y, m, d, 18, 30);
+		cal.set(y, m-1, d, 18, 30);
+		tagList = new ArrayList<Integer>();
 	}
+	
 	public EventInfo id(String id)
 	{
 		ID = id;
@@ -33,27 +33,16 @@ public class EventInfo {
 		URL = url;
 		return this;
 	}
-
-	public EventInfo date(Date d)
-	{
-		date = d;
-		return this;
-	}
 	
-	public EventInfo time(Time t)
+	public EventInfo addTag(int i)
 	{
-		time = t;
+		tagList.add(i);
 		return this;
-	}
-	
-	public EventInfo tag()
-	{
-		// TODO
-		return null;
 	}
 	
 	public Date getDate() { return cal.getTime();}
-	public Time getTime() { return time;}
 	public Calendar getCal() { return cal;}
+	public ArrayList<Integer> getTagList() { return tagList; }
+	
 	
 }

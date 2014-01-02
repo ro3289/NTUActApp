@@ -32,7 +32,7 @@
 		    android:value="@integer/google_play_services_version" />
 	    <meta-data
 		    android:name="com.google.android.maps.v2.API_KEY"
-		    android:value="AIzaSyDRmXqf4_EBAvQuLuDhKUaVePMo0GsV4C4"/>
+		    android:value="AIzaSyAcOlCr8c2ydxMbLEwe6j42IwYg7P8Aqdk"/>
 	    
         <activity
             android:name="com.example.eventmap.MainActivity"

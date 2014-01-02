@@ -4,15 +4,9 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     >
-    <Button  
-        android:layout_width="wrap_content" 
-        android:layout_height="wrap_content" 
-        android:text="Date"
-        android:id="@+id/dateButton"
-    />
     <TextView
         android:layout_width="wrap_content" 
         android:layout_height="wrap_content" 
-        android:id="@+id/dateText"
+        android:id="@+id/testtext"
     />
 </LinearLayout>

@@ -15,10 +15,12 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
 
+import android.os.AsyncTask;
 import android.util.Log;
 
-public class DBConnector {
-    public static String executeQuery(String query_string) {
+public class DBConnector extends AsyncTask<String, Void, String>{
+	@Override
+    protected String doInBackground(String... query_string) {
         String result = "";
         
         try {
@@ -26,7 +28,7 @@ public class DBConnector {
             HttpClient httpClient = new DefaultHttpClient();
             HttpPost httpPost = new HttpPost("http://140.112.18.223/AndroidConnectDB/android_connect_db.php");
             ArrayList<NameValuePair> params = new ArrayList<NameValuePair>();
-            params.add(new BasicNameValuePair("query_string", query_string));
+            params.add(new BasicNameValuePair("query_string", query_string[0]));
             httpPost.setEntity(new UrlEncodedFormEntity(params, HTTP.UTF_8));
             HttpResponse httpResponse = httpClient.execute(httpPost);
             //view_account.setText(httpResponse.getStatusLine().toString());
@@ -49,4 +51,5 @@ public class DBConnector {
         
         return result;
     }
+
 }

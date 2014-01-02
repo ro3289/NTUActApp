@@ -67,7 +67,7 @@ public class MainActivity extends Activity {
         TableLayout.LayoutParams row_layout = new TableLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
         TableRow.LayoutParams view_layout = new TableRow.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
         try {
-            String result = DBConnector.executeQuery("SELECT * FROM activity");
+            String result = new DBConnector().execute("SELECT * FROM activity").get();
             System.out.println(result);
             /*
                 SQL 結果有多筆資料時使用JSONArray

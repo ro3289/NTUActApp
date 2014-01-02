@@ -66,9 +66,9 @@ public class MapActivity extends Activity implements OnInfoWindowClickListener{
 	private final ArrayList<Marker> dateFilterResult = new ArrayList<Marker>();  
 	
 	// Test event location stub
-	static final LatLng A = new LatLng(23.979548, 120.696745);
-	static final LatLng B = new LatLng(24.0, 120.696745);
-	static final LatLng C = new LatLng(24.0, 120.706745);
+	static final LatLng A = new LatLng(25.179548, 121.396745);
+	static final LatLng B = new LatLng(25.1, 121.396745);
+	static final LatLng C = new LatLng(25.1, 121.406745);
 	
 	
 	
@@ -78,7 +78,6 @@ public class MapActivity extends Activity implements OnInfoWindowClickListener{
 		setContentView(R.layout.activity_map);
 	    map = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
         // map.setOnInfoWindowClickListener(this);
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(A, 16));
         
         constructMap();
      //   dateFilter("2014-01-01", "2014-04-01");
@@ -197,7 +196,7 @@ public class MapActivity extends Activity implements OnInfoWindowClickListener{
 			EventInfo event = new EventInfo(ID, Name, Location, url, Content, sdf.parse(date));
 			Marker marker = map.addMarker(new MarkerOptions().position(new LatLng(lat, lng)).title(Name));
 			eventHashMap.put(marker, event);
-			map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lng), 16));
+			map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lng), 10));
 			dateFilterResult.add(marker);
 		} catch (ParseException e) {
 			e.printStackTrace();

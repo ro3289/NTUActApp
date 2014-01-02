@@ -26,6 +26,7 @@ import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 
 
 import android.os.AsyncTask;
@@ -43,8 +44,6 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-
-import com.example.database.*;
 
 public class MapActivity extends Activity implements OnInfoWindowClickListener{
 
@@ -354,5 +353,12 @@ public class MapActivity extends Activity implements OnInfoWindowClickListener{
 	           }).show();
             }
         });
+	}
+	
+	@Override
+	public void onBackPressed() {
+	    Intent myIntent=new Intent(MapActivity.this, MainActivity.class);
+        startActivity(myIntent);
+        finish();
 	}
 }

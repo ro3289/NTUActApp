@@ -95,41 +95,6 @@ public class MapActivity extends Activity implements OnInfoWindowClickListener{
         
         setButton();
 	}
-	
-	public class DBConnector extends AsyncTask<String, Void, String>{
-		@Override
-		protected String doInBackground(String... query_string) {
-			String result = "";
-	        
-	        try {
-	        	System.out.println(":)");
-	            HttpClient httpClient = new DefaultHttpClient();
-	            HttpPost httpPost = new HttpPost("http://140.112.18.223/AndroidConnectDB/android_connect_db.php");
-	            ArrayList<NameValuePair> params = new ArrayList<NameValuePair>();
-	            params.add(new BasicNameValuePair("query_string", query_string[0]));
-	            httpPost.setEntity(new UrlEncodedFormEntity(params, HTTP.UTF_8));
-	            HttpResponse httpResponse = httpClient.execute(httpPost);
-	            //view_account.setText(httpResponse.getStatusLine().toString());
-	            HttpEntity httpEntity = httpResponse.getEntity();
-	            InputStream inputStream = httpEntity.getContent();
-	            
-	            BufferedReader bufReader = new BufferedReader(new InputStreamReader(inputStream, "utf-8"), 8);
-	            StringBuilder builder = new StringBuilder();
-	            String line = null;
-	            while((line = bufReader.readLine()) != null) {
-	                builder.append(line + "\n");
-	            }
-	            inputStream.close();
-	            result = builder.toString();
-	            
-	        } catch(Exception e) {
-	             Log.e("log_tag", e.toString());
-	        	System.out.println(":(");
-	        }
-	        
-	        return result;
-		}
-	}
 
 	// Method
 	

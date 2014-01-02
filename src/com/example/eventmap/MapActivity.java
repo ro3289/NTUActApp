@@ -28,6 +28,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 
 
 import android.os.AsyncTask;
@@ -376,5 +377,12 @@ public class MapActivity extends Activity implements OnInfoWindowClickListener{
 	           }).show();
             }
         });
+	}
+	
+	@Override
+	public void onBackPressed() {
+	    Intent myIntent=new Intent(MapActivity.this, MainActivity.class);
+        startActivity(myIntent);
+        finish();
 	}
 }

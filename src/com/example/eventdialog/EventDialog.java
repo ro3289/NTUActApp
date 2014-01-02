@@ -1,7 +1,7 @@
 package com.example.eventdialog;
 
 
-import com.example.eventmap.R;
+
 
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
@@ -20,13 +20,5 @@ public class EventDialog extends DialogFragment{
 		
 	}
 	
-	@Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.eventdialog_layout, container, false);
-        TextView tv = (TextView) inflater.findViewById(R.id.testtext);
-        setText("This is an instance of MyDialogFragment");
-        return v;
-    }
 	
 }

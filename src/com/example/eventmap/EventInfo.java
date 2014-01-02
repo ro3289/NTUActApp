@@ -10,8 +10,11 @@ import com.google.android.gms.maps.model.Marker;
 
 public class EventInfo {
 	
-	private String 	ID;
-	private String 	URL;
+	private int 	id;
+	private String  name;
+	private String  location;
+	private String 	url;
+	private String  content;
 	private Calendar cal;
 	private ArrayList<Integer> tagList;
 
@@ -22,15 +25,26 @@ public class EventInfo {
 		tagList = new ArrayList<Integer>();
 	}
 	
-	public EventInfo id(String id)
+	public EventInfo(int ID, String Name, String Location, String u, String Content, Date date)
 	{
-		ID = id;
+		id = ID;
+		name = Name;
+		location = Location;
+		url = u;
+		content = Content;
+		cal = Calendar.getInstance();
+		cal.setTime(date);
+		tagList = new ArrayList<Integer>();
+	}
+	public EventInfo id(int i)
+	{
+		id = i;
 		return this;
 	};
 	
-	public EventInfo url(String url)
+	public EventInfo url(String u)
 	{
-		URL = url;
+		url = u;
 		return this;
 	}
 	

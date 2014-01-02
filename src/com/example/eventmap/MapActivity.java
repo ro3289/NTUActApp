@@ -21,10 +21,12 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
 
 
+import org.json.JSONArray;
+import org.json.JSONException;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
-
 import android.content.DialogInterface;
 
 
@@ -91,27 +93,6 @@ public class MapActivity extends Activity implements OnInfoWindowClickListener{
         startDateText = (TextView)findViewById(R.id.startDateText);
         endDateText = (TextView)findViewById(R.id.endDateText);
         
-        try {
-			String see=new DBConnector().execute("SELECT Name FROM activity WHERE ID = 0").get();
-			System.out.println(see);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-        try {
-			String see2=new DBConnector().execute("SELECT Name FROM activity WHERE ID = 1").get();
-			System.out.println(see2);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-        
         setButton();
 	}
 	
@@ -163,18 +144,63 @@ public class MapActivity extends Activity implements OnInfoWindowClickListener{
 		Marker marker = map.addMarker(new MarkerOptions().position(A).title("AAA").snippet("MMM"));
 		System.out.println(event.getDate());
 		eventHashMap.put(marker,event);
+		dateFilterResult.add(marker);
 		
 		EventInfo event1 = new EventInfo(2014,3,9);
 		event1.addTag(2).addTag(0);
 		Marker marker1 = map.addMarker(new MarkerOptions().position(B).title("BBB").snippet("MMM"));
 		System.out.println(event1.getDate());
 		eventHashMap.put(marker1, event1);
+		dateFilterResult.add(marker1);
 		
 		EventInfo event2 = new EventInfo(2014,5,8);
 		event2.addTag(0).addTag(1);
 		Marker marker2 = map.addMarker(new MarkerOptions().position(C).title("CCC").snippet("MMM"));
 		System.out.println(event2.getDate());
 		eventHashMap.put(marker2, event2);
+		dateFilterResult.add(marker2);
+		
+		try {
+			String resultData = new DBConnector().execute("SELECT * FROM activity").get();
+			JSONArray jsonArray = new JSONArray(resultData);
+			System.out.println("JSONArray length = " + jsonArray.length());
+			for(int index = 0; index < jsonArray.length(); ++index)
+			{
+				int ID 			= jsonArray.getJSONObject(index).getInt("ID");
+				String name 	= jsonArray.getJSONObject(index).getString("Name");
+				String location = jsonArray.getJSONObject(index).getString("Location");
+				String url 		= jsonArray.getJSONObject(index).getString("url");
+				String content 	= jsonArray.getJSONObject(index).getString("Content");
+				String date 	= jsonArray.getJSONObject(index).getString("Time");
+				double lat 		= jsonArray.getJSONObject(index).getDouble("Latitude");
+				double lng 		= jsonArray.getJSONObject(index).getDouble("Longitude");
+				createEvent(ID, name, location, url, content, lat, lng, date);
+			}
+			
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	private void createEvent(int ID, String Name, String Location, String url, String Content, double lat, double lng, String date) 
+	{
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		try {
+			EventInfo event = new EventInfo(ID, Name, Location, url, Content, sdf.parse(date));
+			Marker marker = map.addMarker(new MarkerOptions().position(new LatLng(lat, lng)).title(Name));
+			eventHashMap.put(marker, event);
+			map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lng), 16));
+			dateFilterResult.add(marker);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	// Date & Tag filters should be considered at the same time!!!!

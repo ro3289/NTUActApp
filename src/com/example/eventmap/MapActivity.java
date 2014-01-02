@@ -176,7 +176,6 @@ public class MapActivity extends Activity implements OnInfoWindowClickListener{
 	public void dateSelectDialog(final boolean setEnd) {
 	    Calendar c = Calendar.getInstance();
 		new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
-	    	 
 						                 @Override  
 						                 public void onDateSet(DatePicker view,  int  year, int  monthOfYear,  int  dayOfMonth) 
 						                 {  
@@ -265,7 +264,6 @@ public class MapActivity extends Activity implements OnInfoWindowClickListener{
 		            	   mSelectedItems.clear();
 	            	   }
 	               }
-	            	   	
 	           })
 	           .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
 	               @Override

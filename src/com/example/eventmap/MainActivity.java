@@ -5,10 +5,13 @@ import org.json.JSONObject;
 
 import android.app.ActionBar.LayoutParams;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TableLayout;
@@ -36,8 +39,37 @@ public class MainActivity extends Activity {
         .penaltyLog()  
         .penaltyDeath()  
         .build());
-        
+
         getActivitiesRecords();
+        
+        Button infoDialog = (Button) findViewById(R.id.get_info);
+        infoDialog.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				showDialog();
+			}
+		});
+    }
+    void showDialog() {
+    	LayoutInflater layoutInflater = getLayoutInflater();
+		final View inflater = layoutInflater.inflate(R.layout.event_dialog, null) ;
+    	new AlertDialog.Builder(this)
+        .setTitle("")
+        .setView(inflater)
+        .setPositiveButton(R.string.ok,
+            new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int whichButton) {
+                }
+            }
+        )
+        .setNegativeButton(R.string.cancel,
+            new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int whichButton) {
+                }
+            }
+        )
+        .show();
     }
     
     private Button button_get_record;
@@ -71,7 +103,7 @@ public class MainActivity extends Activity {
             System.out.println(result);
             /*
                 SQL 結果有多筆資料時使用JSONArray
-                只有一筆資料時直接建立JSONObject物件
+                                                        只有一筆資料時直接建立JSONObject物件
                 JSONObject jsonData = new JSONObject(result);
             */
             JSONArray jsonArray = new JSONArray(result);

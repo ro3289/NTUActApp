@@ -10,11 +10,11 @@ import com.google.android.gms.maps.model.Marker;
 
 public class EventInfo {
 	
-	private int 	id;
-	private String  name;
-	private String  location;
-	private String 	url;
-	private String  content;
+	public int 	id;
+	public String  name;
+	public String  location;
+	public String 	url;
+	public String  content;
 	private Calendar cal;
 	private ArrayList<Integer> tagList;
 
@@ -55,8 +55,7 @@ public class EventInfo {
 	}
 	
 	public Date getDate() { return cal.getTime();}
-	public Calendar getCal() { return cal;}
+	public boolean before(Calendar when){ return cal.before(when);}
+	public boolean after(Calendar when){ return cal.after(when);}
 	public ArrayList<Integer> getTagList() { return tagList; }
-	
-	
 }

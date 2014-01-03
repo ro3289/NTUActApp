@@ -1,25 +1,12 @@
 package com.example.eventmap;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
-
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.protocol.HTTP;
-
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -29,11 +16,8 @@ import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-
-
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -51,9 +35,6 @@ public class MapActivity extends Activity implements OnInfoWindowClickListener{
 
 	private GoogleMap 	map;
 	private HashMap<Marker,EventInfo> eventHashMap = new HashMap<Marker,EventInfo>();
-	
-	private boolean DATE_FILTER_ACTIVATED = false;
-	private boolean TAG_FILTER_ACTIVATED  = false;
 
     private Button startDateButton, endDateButton, searchButton, resetButton;
     private Calendar calendar;
@@ -77,22 +58,9 @@ public class MapActivity extends Activity implements OnInfoWindowClickListener{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_map);
 	    map = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
-        // map.setOnInfoWindowClickListener(this);
-        
+        map.setOnInfoWindowClickListener(this);
+        setCalendar();
         constructMap();
-     //   dateFilter("2014-01-01", "2014-04-01");
-        
-        calendar = Calendar.getInstance();
-        mYear = calendar.get(Calendar.YEAR);
-        mMonth = calendar.get(Calendar.MONTH);
-        mDay = calendar.get(Calendar.DAY_OF_MONTH);
-        
-        startDate = new String(mYear +"-" + mMonth + "-" + mDay);
-        endDate = new String(mYear +"-" + mMonth + "-" + mDay);
-        
-        startDateText = (TextView)findViewById(R.id.startDateText);
-        endDateText = (TextView)findViewById(R.id.endDateText);
-        
         setButton();
 	}
 
@@ -131,7 +99,7 @@ public class MapActivity extends Activity implements OnInfoWindowClickListener{
 			System.out.println("JSONArray length = " + jsonArray.length());
 			for(int index = 0; index < jsonArray.length(); ++index)
 			{
-				int ID 			= jsonArray.getJSONObject(index).getInt("ID");
+				int    ID 	    = jsonArray.getJSONObject(index).getInt("ID");
 				String name 	= jsonArray.getJSONObject(index).getString("Name");
 				String location = jsonArray.getJSONObject(index).getString("Location");
 				String url 		= jsonArray.getJSONObject(index).getString("url");
@@ -199,14 +167,13 @@ public class MapActivity extends Activity implements OnInfoWindowClickListener{
 			for(Marker marker : eventHashMap.keySet())
 			{
 				EventInfo event = eventHashMap.get(marker);
-				if((event.getCal().before(end) && event.getCal().after(start))){
+				if((event.before(end) && event.after(start))){
 					marker.setVisible(true);
 					dateFilterResult.add(marker);
 				}else{
 					marker.setVisible(false);
 				}
 			}
-			TAG_FILTER_ACTIVATED = true;
 		}else{
 			// Show alert dialog
 		}
@@ -226,8 +193,6 @@ public class MapActivity extends Activity implements OnInfoWindowClickListener{
 	
 	public void resetFilter()
 	{
-		DATE_FILTER_ACTIVATED = false;
-		TAG_FILTER_ACTIVATED  = false;
 		dateFilterResult.clear();
 		for(Marker marker : eventHashMap.keySet())
 		{
@@ -239,7 +204,30 @@ public class MapActivity extends Activity implements OnInfoWindowClickListener{
 	// Listener
 	@Override
 	public void onInfoWindowClick(Marker marker) {
-		
+		showDialog(eventHashMap.get(marker));
+	}
+	
+	 void showDialog(EventInfo event) {
+    	LayoutInflater layoutInflater = getLayoutInflater();
+		final View inflater = layoutInflater.inflate(R.layout.event_dialog, null) ;
+		((TextView) inflater.findViewById(R.id.eventname)).setText(event.name);
+		((TextView) inflater.findViewById(R.id.content)).setText(event.content);
+    	new AlertDialog.Builder(this)
+        .setTitle("")
+        .setView(inflater)
+        .setPositiveButton(R.string.ok,
+            new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int whichButton) {
+                }
+            }
+        )
+        .setNegativeButton(R.string.cancel,
+            new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int whichButton) {
+                }
+            }
+        )
+        .show();
 	}
 	
 	public void dateSelectDialog(final boolean setEnd) {
@@ -260,6 +248,19 @@ public class MapActivity extends Activity implements OnInfoWindowClickListener{
              // 設置初始日期  
              , c.get(Calendar.YEAR) , c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH))
 	     .show();  
+	}
+	private void setCalendar()
+	{
+		calendar = Calendar.getInstance();
+        mYear = calendar.get(Calendar.YEAR);
+        mMonth = calendar.get(Calendar.MONTH);
+        mDay = calendar.get(Calendar.DAY_OF_MONTH);
+        
+        startDate = new String(mYear +"-" + mMonth + "-" + mDay);
+        endDate = new String(mYear +"-" + mMonth + "-" + mDay);
+        
+        startDateText = (TextView)findViewById(R.id.startDateText);
+        endDateText = (TextView)findViewById(R.id.endDateText);
 	}
 	private void setButton()
 	{

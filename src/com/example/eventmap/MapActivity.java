@@ -5,6 +5,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
 
@@ -17,7 +18,6 @@ import android.app.DatePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -99,7 +99,7 @@ public class MapActivity extends Activity implements OnInfoWindowClickListener{
 		try {
 			String resultData = new DBConnector().execute("SELECT * FROM activity").get();
 			JSONArray jsonArray = new JSONArray(resultData);
-			System.out.println("JSONArray length = " + jsonArray.length());
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			for(int index = 0; index < jsonArray.length(); ++index)
 			{
 				int    ID 	    = jsonArray.getJSONObject(index).getInt("ID");
@@ -110,7 +110,12 @@ public class MapActivity extends Activity implements OnInfoWindowClickListener{
 				String date 	= jsonArray.getJSONObject(index).getString("Time");
 				double lat 		= jsonArray.getJSONObject(index).getDouble("Latitude");
 				double lng 		= jsonArray.getJSONObject(index).getDouble("Longitude");
-				createEvent(ID, name, location, url, content, lat, lng, date);
+				try {
+					createEvent(ID, name, location, url, content, new LatLng(lat, lng), sdf.parse(date));
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 			
 		} catch (InterruptedException e) {
@@ -125,18 +130,13 @@ public class MapActivity extends Activity implements OnInfoWindowClickListener{
 		}
 	}
 	
-	private void createEvent(int ID, String Name, String Location, String url, String Content, double lat, double lng, String date) 
+	private void createEvent(int ID, String Name, String Location, String url, String Content, LatLng position, Date date) 
 	{
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		try {
-			EventInfo event = new EventInfo(ID, Name, Location, url, Content, sdf.parse(date));
-			Marker marker = map.addMarker(new MarkerOptions().position(new LatLng(lat, lng)).title(Name));
-			eventHashMap.put(marker, event);
-			map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lng), 10));
-			dateFilterResult.add(marker);
-		} catch (ParseException e) {
-			e.printStackTrace();
-		}
+		EventInfo event = new EventInfo(ID, Name, Location, url, Content, date);
+		Marker marker = map.addMarker(new MarkerOptions().position(position).title(Name));
+		eventHashMap.put(marker, event);
+		map.moveCamera(CameraUpdateFactory.newLatLngZoom(position, 10));
+		dateFilterResult.add(marker);
 	}
 	
 	// Date & Tag filters should be considered at the same time!!!!
@@ -178,7 +178,7 @@ public class MapActivity extends Activity implements OnInfoWindowClickListener{
 				}
 			}
 		}else{
-			// Show alert dialog
+			// Show alert dialog and reset search dates
 		}
 		
 	}

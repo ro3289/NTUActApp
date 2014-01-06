@@ -2,13 +2,12 @@ package com.example.eventmap;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import com.google.android.gms.maps.model.LatLng;
 
 import android.app.ActionBar.LayoutParams;
 import android.app.Activity;
@@ -46,8 +45,8 @@ public class MainActivity extends Activity {
         .penaltyDeath()  
         .build());
 
-        getActivitiesRecords();
-        
+        // getActivitiesRecords();
+        getEventInfo();
         
         Button infoDialog = (Button) findViewById(R.id.get_info);
         infoDialog.setOnClickListener(new View.OnClickListener() {
@@ -83,7 +82,7 @@ public class MainActivity extends Activity {
     	try {
 			String resultData = new DBConnector().execute("SELECT * FROM activity").get();
 			JSONArray jsonArray = new JSONArray(resultData);
-			System.out.println("JSONArray length = " + jsonArray.length());
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			for(int index = 0; index < jsonArray.length(); ++index)
 			{
 				int    ID 	    = jsonArray.getJSONObject(index).getInt("ID");
@@ -92,12 +91,8 @@ public class MainActivity extends Activity {
 				String url 		= jsonArray.getJSONObject(index).getString("url");
 				String content 	= jsonArray.getJSONObject(index).getString("Content");
 				String date 	= jsonArray.getJSONObject(index).getString("Time");
-				double lat 		= jsonArray.getJSONObject(index).getDouble("Latitude");
-				double lng 		= jsonArray.getJSONObject(index).getDouble("Longitude");
-				LatLng position = new LatLng(lat, lng);
-				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 				try {
-					EventInfo event = new EventInfo(ID, name, location, url, content, sdf.parse(date));
+					eventList.add(new EventInfo(ID, name, location, url, content, sdf.parse(date)));
 				} catch (ParseException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

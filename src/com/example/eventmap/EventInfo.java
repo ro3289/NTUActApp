@@ -4,14 +4,11 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
-import android.text.format.Time;
-
-import com.google.android.gms.maps.model.Marker;
-
 public class EventInfo {
 	
 	public int 	id;
 	public String  name;
+	public String  snippet;
 	public String  location;
 	public String 	url;
 	public String  content;

@@ -23,6 +23,7 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.TextView;
 
+import com.example.eventdialog.EventDialog;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
@@ -45,6 +46,8 @@ public class MapActivity extends Activity implements OnInfoWindowClickListener{
     private Button tagButton;
     private final ArrayList<Integer> mSelectedItems = new ArrayList<Integer>();  // Where we track the selected items
 	private final ArrayList<Marker> dateFilterResult = new ArrayList<Marker>();  
+	
+	private EventDialog eventDialog = new EventDialog(this);
 	
 	// Test event location stub
 	static final LatLng A = new LatLng(25.179548, 121.396745);
@@ -204,30 +207,7 @@ public class MapActivity extends Activity implements OnInfoWindowClickListener{
 	// Listener
 	@Override
 	public void onInfoWindowClick(Marker marker) {
-		showDialog(eventHashMap.get(marker));
-	}
-	
-	 void showDialog(EventInfo event) {
-    	LayoutInflater layoutInflater = getLayoutInflater();
-		final View inflater = layoutInflater.inflate(R.layout.event_dialog, null) ;
-		((TextView) inflater.findViewById(R.id.eventname)).setText(event.name);
-		((TextView) inflater.findViewById(R.id.content)).setText(event.content);
-    	new AlertDialog.Builder(this)
-        .setTitle("")
-        .setView(inflater)
-        .setPositiveButton(R.string.ok,
-            new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int whichButton) {
-                }
-            }
-        )
-        .setNegativeButton(R.string.cancel,
-            new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int whichButton) {
-                }
-            }
-        )
-        .show();
+		eventDialog.showDialog(eventHashMap.get(marker));
 	}
 	
 	public void dateSelectDialog(final boolean setEnd) {
@@ -249,6 +229,7 @@ public class MapActivity extends Activity implements OnInfoWindowClickListener{
              , c.get(Calendar.YEAR) , c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH))
 	     .show();  
 	}
+	
 	private void setCalendar()
 	{
 		calendar = Calendar.getInstance();

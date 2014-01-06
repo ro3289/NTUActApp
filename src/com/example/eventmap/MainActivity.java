@@ -1,17 +1,21 @@
 package com.example.eventmap;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.concurrent.ExecutionException;
+
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
+
+import com.google.android.gms.maps.model.LatLng;
 
 import android.app.ActionBar.LayoutParams;
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TableLayout;
@@ -20,6 +24,8 @@ import android.widget.TextView;
 
 public class MainActivity extends Activity {
 
+	ArrayList<EventInfo> eventList = new ArrayList<EventInfo>();
+	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,35 +48,16 @@ public class MainActivity extends Activity {
 
         getActivitiesRecords();
         
+        
         Button infoDialog = (Button) findViewById(R.id.get_info);
         infoDialog.setOnClickListener(new View.OnClickListener() {
-			
 			@Override
 			public void onClick(View v) {
-				showDialog();
+				
 			}
 		});
     }
-    void showDialog() {
-    	LayoutInflater layoutInflater = getLayoutInflater();
-		final View inflater = layoutInflater.inflate(R.layout.event_dialog, null) ;
-    	new AlertDialog.Builder(this)
-        .setTitle("")
-        .setView(inflater)
-        .setPositiveButton(R.string.ok,
-            new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int whichButton) {
-                }
-            }
-        )
-        .setNegativeButton(R.string.cancel,
-            new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int whichButton) {
-                }
-            }
-        )
-        .show();
-    }
+   
     
     private Button button_get_record;
     
@@ -91,6 +78,43 @@ public class MainActivity extends Activity {
         }
     };
 
+    private void getEventInfo()
+    {
+    	try {
+			String resultData = new DBConnector().execute("SELECT * FROM activity").get();
+			JSONArray jsonArray = new JSONArray(resultData);
+			System.out.println("JSONArray length = " + jsonArray.length());
+			for(int index = 0; index < jsonArray.length(); ++index)
+			{
+				int    ID 	    = jsonArray.getJSONObject(index).getInt("ID");
+				String name 	= jsonArray.getJSONObject(index).getString("Name");
+				String location = jsonArray.getJSONObject(index).getString("Location");
+				String url 		= jsonArray.getJSONObject(index).getString("url");
+				String content 	= jsonArray.getJSONObject(index).getString("Content");
+				String date 	= jsonArray.getJSONObject(index).getString("Time");
+				double lat 		= jsonArray.getJSONObject(index).getDouble("Latitude");
+				double lng 		= jsonArray.getJSONObject(index).getDouble("Longitude");
+				LatLng position = new LatLng(lat, lng);
+				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+				try {
+					EventInfo event = new EventInfo(ID, name, location, url, content, sdf.parse(date));
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    }
     private void getActivitiesRecords() {
         // TODO Auto-generated method stub
         System.out.println("herehere");

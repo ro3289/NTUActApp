@@ -54,8 +54,6 @@ public class MapActivity extends Activity implements OnInfoWindowClickListener{
 	static final LatLng B = new LatLng(25.1, 121.396745);
 	static final LatLng C = new LatLng(25.1, 121.406745);
 	
-	
-	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);

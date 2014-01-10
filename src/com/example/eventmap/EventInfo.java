@@ -7,22 +7,15 @@ import java.util.Date;
 public class EventInfo {
 	
 	public int 	id;
-	public String  name;
-	public String  snippet;
-	public String  location;
+	public String  	name;
+	public String  	snippet;
+	public String  	location;
 	public String 	url;
-	public String  content;
+	public String  	content;
 	private Calendar cal;
-	private ArrayList<Integer> tagList;
-
-	public EventInfo (int y, int m, int d)
-	{
-		cal = Calendar.getInstance();
-		cal.set(y, m-1, d, 18, 30);
-		tagList = new ArrayList<Integer>();
-	}
+	private int 	tagValue;
 	
-	public EventInfo(int ID, String Name, String Location, String u, String Content, Date date)
+	public EventInfo(int ID, String Name, String Location, String u, String Content, Date date, int tag)
 	{
 		id = ID;
 		name = Name;
@@ -31,7 +24,7 @@ public class EventInfo {
 		content = Content;
 		cal = Calendar.getInstance();
 		cal.setTime(date);
-		tagList = new ArrayList<Integer>();
+		tagValue = tag;
 	}
 	public EventInfo id(int i)
 	{
@@ -45,14 +38,9 @@ public class EventInfo {
 		return this;
 	}
 	
-	public EventInfo addTag(int i)
-	{
-		tagList.add(i);
-		return this;
-	}
 	
 	public Date getDate() { return cal.getTime();}
 	public boolean before(Calendar when){ return cal.before(when);}
 	public boolean after(Calendar when){ return cal.after(when);}
-	public ArrayList<Integer> getTagList() { return tagList; }
+	public int getTagValue() { return tagValue; }
 }

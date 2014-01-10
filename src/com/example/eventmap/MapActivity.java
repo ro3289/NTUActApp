@@ -69,47 +69,25 @@ public class MapActivity extends Activity implements OnInfoWindowClickListener{
 	
 	private void constructMap()
 	{
-		// Fetch data from remote server
-		// TODO
-		// Construct events
-		
-		EventInfo event = new EventInfo(2014,2,3);
-		event.addTag(1).addTag(2);
-		Marker marker = map.addMarker(new MarkerOptions().position(A).title("AAA").snippet("MMM"));
-		System.out.println(event.getDate());
-		eventHashMap.put(marker,event);
-		dateFilterResult.add(marker);
-		
-		EventInfo event1 = new EventInfo(2014,3,9);
-		event1.addTag(2).addTag(0);
-		Marker marker1 = map.addMarker(new MarkerOptions().position(B).title("BBB").snippet("MMM"));
-		System.out.println(event1.getDate());
-		eventHashMap.put(marker1, event1);
-		dateFilterResult.add(marker1);
-		
-		EventInfo event2 = new EventInfo(2014,5,8);
-		event2.addTag(0).addTag(1);
-		Marker marker2 = map.addMarker(new MarkerOptions().position(C).title("CCC").snippet("MMM"));
-		System.out.println(event2.getDate());
-		eventHashMap.put(marker2, event2);
-		dateFilterResult.add(marker2);
-		
 		try {
+			// Fetch data from remote server
 			String resultData = new DBConnector().execute("SELECT * FROM activity").get();
 			JSONArray jsonArray = new JSONArray(resultData);
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			for(int index = 0; index < jsonArray.length(); ++index)
 			{
-				int    ID 	    = jsonArray.getJSONObject(index).getInt("ID");
-				String name 	= jsonArray.getJSONObject(index).getString("Name");
-				String location = jsonArray.getJSONObject(index).getString("Location");
-				String url 		= jsonArray.getJSONObject(index).getString("url");
-				String content 	= jsonArray.getJSONObject(index).getString("Content");
-				String date 	= jsonArray.getJSONObject(index).getString("Time");
-				double lat 		= jsonArray.getJSONObject(index).getDouble("Latitude");
-				double lng 		= jsonArray.getJSONObject(index).getDouble("Longitude");
+				int    	ID 	    = jsonArray.getJSONObject(index).getInt("ID");
+				String 	name 	= jsonArray.getJSONObject(index).getString("Name");
+				String 	location = jsonArray.getJSONObject(index).getString("Location");
+				String 	url 	= jsonArray.getJSONObject(index).getString("url");
+				String 	content = jsonArray.getJSONObject(index).getString("Content");
+				String 	date 	= jsonArray.getJSONObject(index).getString("Time");
+				double 	lat 	= jsonArray.getJSONObject(index).getDouble("Latitude");
+				double 	lng 	= jsonArray.getJSONObject(index).getDouble("Longitude");
+				int 	tag		= jsonArray.getJSONObject(index).getInt("Tag");
+				// Construct events
 				try {
-					createEvent(ID, name, location, url, content, new LatLng(lat, lng), sdf.parse(date));
+					createEvent(ID, name, location, url, content, new LatLng(lat, lng), sdf.parse(date), tag);
 				} catch (ParseException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -128,12 +106,12 @@ public class MapActivity extends Activity implements OnInfoWindowClickListener{
 		}
 	}
 	
-	private void createEvent(int ID, String Name, String Location, String url, String Content, LatLng position, Date date) 
+	private void createEvent(int ID, String Name, String Location, String url, String Content, LatLng position, Date date, int tag) 
 	{
-		EventInfo event = new EventInfo(ID, Name, Location, url, Content, date);
+		EventInfo event = new EventInfo(ID, Name, Location, url, Content, date, tag);
 		Marker marker = map.addMarker(new MarkerOptions().position(position).title(Name));
 		eventHashMap.put(marker, event);
-		map.moveCamera(CameraUpdateFactory.newLatLngZoom(position, 10));
+		map.moveCamera(CameraUpdateFactory.newLatLngZoom(position, 15));
 		dateFilterResult.add(marker);
 	}
 	
@@ -181,12 +159,22 @@ public class MapActivity extends Activity implements OnInfoWindowClickListener{
 		
 	}
 	
-	public void tagFilter(int t)
+	public void tagFilter()
 	{
+		// Compute tag value
+		int tag = 0;
+		for(Integer i: mSelectedItems)
+		{
+			tag += Math.pow(2,i.intValue());
+			System.out.println(tag);
+		}
+		mSelectedItems.clear();
 		for(Marker marker : dateFilterResult)
 		{
-			// Set marker invisible if not in the tag list
-			if(!eventHashMap.get(marker).getTagList().contains(t)){
+			if((eventHashMap.get(marker).getTagValue() & tag) == tag)
+			{
+				marker.setVisible(true);
+			}else{
 				marker.setVisible(false);
 			}
 		}
@@ -303,14 +291,8 @@ public class MapActivity extends Activity implements OnInfoWindowClickListener{
 	                   // User clicked OK, so save the mSelectedItems results somewhere
 	                   // or return them to the component that opened the dialog
 	            	   if(!mSelectedItems.isEmpty()){
-		            	   for(Marker m: dateFilterResult){
-		            		   m.setVisible(true);
-		            	   }
-		            	   for(int s: mSelectedItems){
-		            		   tagFilter(s);
-		            		   System.out.println(s);
-		            	   }
-		            	   mSelectedItems.clear();
+		            	   // Show marker by tag value
+		            	   tagFilter();
 	            	   }
 	               }
 	           })

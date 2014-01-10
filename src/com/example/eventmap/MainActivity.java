@@ -91,8 +91,9 @@ public class MainActivity extends Activity {
 				String url 		= jsonArray.getJSONObject(index).getString("url");
 				String content 	= jsonArray.getJSONObject(index).getString("Content");
 				String date 	= jsonArray.getJSONObject(index).getString("Time");
+				int    tag 	    = jsonArray.getJSONObject(index).getInt("Tag");
 				try {
-					eventList.add(new EventInfo(ID, name, location, url, content, sdf.parse(date)));
+					eventList.add(new EventInfo(ID, name, location, url, content, sdf.parse(date), tag));
 				} catch (ParseException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

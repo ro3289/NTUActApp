@@ -1,12 +1,11 @@
 package com.example.eventmap;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
 public class EventInfo {
 	
-	public int 	id;
+	public int 		id;
 	public String  	name;
 	public String  	snippet;
 	public String  	location;
@@ -37,7 +36,6 @@ public class EventInfo {
 		url = u;
 		return this;
 	}
-	
 	
 	public Date getDate() { return cal.getTime();}
 	public boolean before(Calendar when){ return cal.before(when);}

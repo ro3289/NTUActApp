@@ -2,9 +2,14 @@
 <resources>
 
     <string-array name="tags"> 
-　　        	<item>Camp</item> 
-　　       	<item>Party</item> 
-		<item>Official</item> 
+　　        	<item>社團</item> 
+　　       	<item>公益</item> 
+		<item>周</item> 
+		<item>之夜</item> 
+		<item>舞會</item> 
+		<item>演講</item> 
+		<item>體育</item>
+		<item>藝文</item>  
 　　    </string-array> 
 
 </resources>

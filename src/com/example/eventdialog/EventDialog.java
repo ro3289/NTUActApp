@@ -1,24 +1,46 @@
 package com.example.eventdialog;
 
-
-
-
-import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
+import android.widget.TextView;
 
-public class EventDialog extends DialogFragment{
-	
-	static EventDialog newInstance(){
-		return new EventDialog();
-	}
+import com.example.eventmap.EventInfo;
+import com.example.eventmap.R;
 
-	@Override 
-	public void onCreate(Bundle savedInstanceState){
-		
+
+public class EventDialog {
+	
+	private Activity activity;
+	
+	public EventDialog(Activity a)
+	{
+		activity = a;
 	}
 	
+	public void showDialog(EventInfo event) {
+    	LayoutInflater layoutInflater = activity.getLayoutInflater();
+		final View inflater = layoutInflater.inflate(R.layout.event_dialog, null) ;
+		((TextView) inflater.findViewById(R.id.eventname)).setText(event.name);
+		((TextView) inflater.findViewById(R.id.content)).setText(event.content);
+    	new AlertDialog.Builder(activity)
+        .setTitle("")
+        .setView(inflater)
+        .setPositiveButton(R.string.ok,
+            new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int whichButton) {
+                }
+            }
+        )
+        .setNegativeButton(R.string.cancel,
+            new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int whichButton) {
+                }
+            }
+        )
+        .show();
+    }
 	
 }

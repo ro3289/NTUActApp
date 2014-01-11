@@ -13,11 +13,12 @@ import com.example.eventmap.R;
 
 public class EventDialog {
 	
-	private Activity activity;
+	private static final EventDialog Instance = new EventDialog();
 	
-	public EventDialog(Activity a)
-	{
-		activity = a;
+	public Activity activity;
+	
+	public static void setUpEventDialog(Activity a){
+		getInstance().activity = a;
 	}
 	
 	public void showDialog(EventInfo event) {
@@ -26,7 +27,7 @@ public class EventDialog {
 		((TextView) inflater.findViewById(R.id.eventname)).setText(event.name);
 		((TextView) inflater.findViewById(R.id.content)).setText(event.content);
     	new AlertDialog.Builder(activity)
-        .setTitle("")
+        .setTitle(event.name)
         .setView(inflater)
         .setPositiveButton(R.string.ok,
             new DialogInterface.OnClickListener() {
@@ -42,5 +43,9 @@ public class EventDialog {
         )
         .show();
     }
+	
+	public static EventDialog getInstance(){
+		return Instance;
+	}
 	
 }

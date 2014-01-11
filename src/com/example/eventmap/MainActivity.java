@@ -9,6 +9,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.example.eventdialog.EventDialog;
+
 import android.app.ActionBar.LayoutParams;
 import android.app.Activity;
 import android.content.Intent;
@@ -24,8 +26,7 @@ import android.widget.TextView;
 public class MainActivity extends Activity {
 
 	private Account me;
-	private ArrayList<EventInfo> eventList = new ArrayList<EventInfo>();
-	
+	public ArrayList<EventInfo> eventList = new ArrayList<EventInfo>();
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -44,6 +45,7 @@ public class MainActivity extends Activity {
         .penaltyDeath()  
         .build());
 
+        EventDialog.setUpEventDialog(this);
         // getActivitiesRecords();
         this.getEventInfo();
         this.getUserInfo();
@@ -62,16 +64,18 @@ public class MainActivity extends Activity {
         infoDialog.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				me.showMyPreference();
+				// me.showMyPreference();
+				me.showMyEvent();
 			}
 		});
     }
    
     
     private void getUserInfo() {
+    	// User information and preference
     	try {
-			String resultData = new DBConnector().execute("SELECT * FROM userlist").get();
-			JSONArray jsonArray = new JSONArray(resultData);
+			String accountData = new DBConnector().execute("SELECT * FROM userlist WHERE ID = 0" ).get();
+			JSONArray jsonArray = new JSONArray(accountData);
 			if(jsonArray.length() != 0)
 			{
 				int    id 	      = jsonArray.getJSONObject(0).getInt("ID");
@@ -79,6 +83,25 @@ public class MainActivity extends Activity {
 				String password   = jsonArray.getJSONObject(0).getString("Password");
 				int    preference = jsonArray.getJSONObject(0).getInt("Preference");
 				me = new Account(this, id, username, password, preference);
+			}
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	// Tracing events
+    	try {
+			String myEventData = new DBConnector().execute("SELECT * FROM user_act WHERE UserID = 0").get();
+			JSONArray jsonArray = new JSONArray(myEventData);
+			for(int index = 0; index < jsonArray.length(); ++index)
+			{
+				int eventID = jsonArray.getJSONObject(index).getInt("ActID");
+				me.addMyEvent(eventList.get(eventID));
 			}
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
@@ -108,7 +131,7 @@ public class MainActivity extends Activity {
 				String date 	= jsonArray.getJSONObject(index).getString("Time");
 				int    tag 	    = jsonArray.getJSONObject(index).getInt("Tag");
 				try {
-					eventList.add(new EventInfo(ID, name, location, url, content, sdf.parse(date), tag));
+					eventList.add(ID, new EventInfo(ID, name, location, url, content, sdf.parse(date), tag));
 				} catch (ParseException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -126,6 +149,7 @@ public class MainActivity extends Activity {
 			e.printStackTrace();
 		}
     }
+    
     private void getActivitiesRecords() {
         // TODO Auto-generated method stub
         System.out.println("herehere");
@@ -163,5 +187,10 @@ public class MainActivity extends Activity {
         } catch(Exception e) {
             // Log.e("log_tag", e.toString());
         }
+    }
+    
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) 
+    {
+    	EventDialog.getInstance().setUpEventDialog(this);
     }
 }

@@ -6,6 +6,8 @@
     <string name="hello_world">Hello world!</string>
     
     <string name="select_tags">Tag</string>
+    <string name="set_preference">偏好設定</string>
+    <string name="my_events">我的活動</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
 

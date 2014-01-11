@@ -2,21 +2,27 @@ package com.example.eventmap;
 
 import java.util.ArrayList;
 
-import android.app.Activity;
+
+
+import com.example.eventdialog.EventDialog;
+
 import android.app.AlertDialog;
-import android.app.AlertDialog.Builder;
 import android.content.DialogInterface;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.TextView;
 
 public class Account{
 	
-	private Activity activity;
+	private MainActivity activity;
 	private String username;
 	private int userID;
 	private int myPreference;
 	private ArrayList<Integer> selectedItems = new ArrayList<Integer>();
 	private boolean[] checkedItems = new boolean[8]; 
+	private ArrayList<EventInfo> myEventList = new ArrayList<EventInfo>();
 
-	public Account(Activity a, int id, String name, String pwd, int preference)
+	public Account(MainActivity a, int id, String name, String pwd, int preference)
 	{
 		activity 		= a;
 		userID			= id;
@@ -41,7 +47,7 @@ public class Account{
 		}
 		new AlertDialog.Builder(activity)
 	    // Set the dialog title
-	    .setTitle(R.string.select_tags)
+	    .setTitle(R.string.set_preference)
 	    // Specify the list array, the items to be selected by default (null for none),
 	    // and the listener through which to receive callbacks when items are selected
        .setMultiChoiceItems(R.array.tags, checkedItems,
@@ -81,5 +87,37 @@ public class Account{
 			newPreference = (int) Math.pow(2, i.intValue());
 		}
 		myPreference = newPreference;
+	}
+
+	public void addMyEvent(EventInfo event)
+	{
+		myEventList.add(event);
+	}
+	
+	public void showMyEvent()
+	{
+		ArrayList<String> myEventItemsList = new ArrayList<String>();
+		for(EventInfo event : myEventList)
+		{
+			myEventItemsList.add(event.name);
+		}
+		String[] myEventItems = myEventItemsList.toArray(new String[myEventItemsList.size()]);
+    	new AlertDialog.Builder(activity)
+        .setTitle(R.string.my_events)
+        .setItems(myEventItems, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				EventDialog.getInstance().showDialog(myEventList.get(which));
+			}
+		})
+        .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+            }
+        })
+        .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+            }
+        })
+        .show();
 	}
 }

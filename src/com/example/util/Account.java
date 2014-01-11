@@ -1,4 +1,4 @@
-package com.example.eventmap;
+package com.example.util;
 
 import java.awt.Event;
 import java.util.ArrayList;
@@ -6,7 +6,13 @@ import java.util.ArrayList;
 
 
 
-import com.example.eventdialog.EventDialog;
+
+
+
+import com.example.eventmap.MainActivity;
+import com.example.eventmap.R;
+import com.example.eventmap.R.array;
+import com.example.eventmap.R.string;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -107,7 +113,7 @@ public class Account{
         .setItems(myEventItems, new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
-				EventDialog.getInstance().showDialog(myEventList.get(which));
+				EventDialog.getInstance().showEventInfoDialog(myEventList.get(which));
 			}
 		})
         .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {

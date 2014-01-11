@@ -1,6 +1,7 @@
 package com.example.eventmap;
 
-import com.example.eventdialog.EventDialog;
+import com.example.util.Account;
+import com.example.util.EventDialog;
 
 import android.app.Activity;
 import android.content.Context;
@@ -81,7 +82,7 @@ public class FacebookFragment extends ListFragment {
 	@Override
 	 public void onListItemClick(ListView l, View v, int position, long id) {
 		super.onListItemClick(l, v, position, id);
-		EventDialog.getInstance().showDialog(Account.getInstance().getEvent(position));
+		EventDialog.getInstance().showEventInfoDialog(Account.getInstance().getEvent(position));
 	 }
 
 	

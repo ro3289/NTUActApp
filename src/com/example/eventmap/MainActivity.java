@@ -22,7 +22,10 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
-import com.example.eventdialog.EventDialog;
+import com.example.util.Account;
+import com.example.util.DBConnector;
+import com.example.util.EventDialog;
+import com.example.util.EventInfo;
 
 public class MainActivity extends FragmentActivity {
 

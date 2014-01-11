@@ -1,4 +1,4 @@
-package com.example.eventmap;
+package com.example.util;
 
 import java.util.Calendar;
 import java.util.Date;

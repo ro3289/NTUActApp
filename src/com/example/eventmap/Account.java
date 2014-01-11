@@ -100,12 +100,8 @@ public class Account{
 	
 	public void showMyEvent()
 	{
-		ArrayList<String> myEventItemsList = new ArrayList<String>();
-		for(EventInfo event : myEventList)
-		{
-			myEventItemsList.add(event.name);
-		}
-		String[] myEventItems = myEventItemsList.toArray(new String[myEventItemsList.size()]);
+		String[] myEventItems = getEventNameStringArray();
+		
     	new AlertDialog.Builder(activity)
         .setTitle(R.string.my_events)
         .setItems(myEventItems, new DialogInterface.OnClickListener() {
@@ -127,5 +123,18 @@ public class Account{
 	
 	public static Account getInstance(){
 		return INSTANCE;
+	}
+	
+	public String[] getEventNameStringArray(){
+		ArrayList<String> myEventItemsList = new ArrayList<String>();
+		for(EventInfo event : myEventList)
+		{
+			myEventItemsList.add(event.name);
+		}
+		return myEventItemsList.toArray(new String[myEventItemsList.size()]);
+	}
+	
+	public EventInfo getEvent(int which){
+		return myEventList.get(which);
 	}
 }

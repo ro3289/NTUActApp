@@ -1,5 +1,7 @@
 package com.example.eventmap;
 
+import com.example.eventdialog.EventDialog;
+
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
@@ -20,8 +22,7 @@ public class FacebookFragment extends ListFragment {
 	private String value = "";
 	private ListView listView;
 	private ArrayAdapter<String> listAdapter;
-	private String[] month = {"January", "February", "March", "April", "May", "June", 
-	   		 "July",   "August", "September", "October",  "November",  "December" };
+	private String[] myEvent = Account.getInstance().getEventNameStringArray();
 	
 	public class MyListAdapter extends ArrayAdapter<String> {
 		  
@@ -40,8 +41,8 @@ public class FacebookFragment extends ListFragment {
 		   LayoutInflater inflater = (LayoutInflater)myContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		   View row = inflater.inflate(R.layout.listview_preference, parent, false);
 		   
-		   TextView eventName=(TextView)row.findViewById(R.id.month);
-		   eventName.setText(month[position]);
+		   TextView eventName=(TextView)row.findViewById(R.id.event_name);
+		   eventName.setText(myEvent[position]);
 		   
 		   ImageView icon=(ImageView)row.findViewById(R.id.icon);
 		   //Customize your icon here
@@ -73,8 +74,15 @@ public class FacebookFragment extends ListFragment {
 		listAdapter = new ArrayAdapter<String>(mainActivity, android.R.layout.activity_list_item,month);
 		setListAdapter(listAdapter);
 		*/
-		MyListAdapter myListAdapter = new MyListAdapter(getActivity(), R.layout.listview_preference, month);
+		MyListAdapter myListAdapter = new MyListAdapter(getActivity(), R.layout.listview_preference, myEvent);
 		setListAdapter(myListAdapter);
 	}
+	
+	@Override
+	 public void onListItemClick(ListView l, View v, int position, long id) {
+		super.onListItemClick(l, v, position, id);
+		EventDialog.getInstance().showDialog(Account.getInstance().getEvent(position));
+	 }
+
 	
 }

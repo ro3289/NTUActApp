@@ -71,7 +71,6 @@ super.onCreate(savedInstanceState);
         .build());
 
         EventDialog.setUpEventDialog(this);
-        // getActivitiesRecords();
         this.getEventInfo();
         this.getUserInfo();
 

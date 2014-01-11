@@ -47,8 +47,6 @@ public class MapActivity extends Activity implements OnInfoWindowClickListener{
     private final ArrayList<Integer> mSelectedItems = new ArrayList<Integer>();  // Where we track the selected items
 	private final ArrayList<Marker> dateFilterResult = new ArrayList<Marker>();  
 	
-	private EventDialog eventDialog = new EventDialog(this);
-	
 	// Test event location stub
 	static final LatLng A = new LatLng(25.179548, 121.396745);
 	static final LatLng B = new LatLng(25.1, 121.396745);
@@ -63,6 +61,7 @@ public class MapActivity extends Activity implements OnInfoWindowClickListener{
         setCalendar();
         constructMap();
         setButton();
+        EventDialog.setUpEventDialog(this);
 	}
 
 	// Method
@@ -76,15 +75,15 @@ public class MapActivity extends Activity implements OnInfoWindowClickListener{
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			for(int index = 0; index < jsonArray.length(); ++index)
 			{
-				int    	ID 	    = jsonArray.getJSONObject(index).getInt("ID");
-				String 	name 	= jsonArray.getJSONObject(index).getString("Name");
-				String 	location = jsonArray.getJSONObject(index).getString("Location");
-				String 	url 	= jsonArray.getJSONObject(index).getString("url");
-				String 	content = jsonArray.getJSONObject(index).getString("Content");
-				String 	date 	= jsonArray.getJSONObject(index).getString("Time");
-				double 	lat 	= jsonArray.getJSONObject(index).getDouble("Latitude");
-				double 	lng 	= jsonArray.getJSONObject(index).getDouble("Longitude");
-				int 	tag		= jsonArray.getJSONObject(index).getInt("Tag");
+				int    ID 	    = jsonArray.getJSONObject(index).getInt("ID");
+				String name 	= jsonArray.getJSONObject(index).getString("Name");
+				String location = jsonArray.getJSONObject(index).getString("Location");
+				String url 		= jsonArray.getJSONObject(index).getString("url");
+				String content 	= jsonArray.getJSONObject(index).getString("Content");
+				String date 	= jsonArray.getJSONObject(index).getString("Time");
+				double lat 		= jsonArray.getJSONObject(index).getDouble("Latitude");
+				double lng 		= jsonArray.getJSONObject(index).getDouble("Longitude");
+				int    tag		= jsonArray.getJSONObject(index).getInt("Tag");
 				// Construct events
 				try {
 					createEvent(ID, name, location, url, content, new LatLng(lat, lng), sdf.parse(date), tag);
@@ -193,7 +192,7 @@ public class MapActivity extends Activity implements OnInfoWindowClickListener{
 	// Listener
 	@Override
 	public void onInfoWindowClick(Marker marker) {
-		eventDialog.showDialog(eventHashMap.get(marker));
+		EventDialog.getInstance().showDialog(eventHashMap.get(marker));
 	}
 	
 	public void dateSelectDialog(final boolean setEnd) {

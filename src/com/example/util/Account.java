@@ -1,44 +1,39 @@
 package com.example.util;
 
-import java.awt.Event;
+
 import java.util.ArrayList;
-
-
-
-
-
-
 
 import com.example.eventmap.MainActivity;
 import com.example.eventmap.R;
-import com.example.eventmap.R.array;
-import com.example.eventmap.R.string;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.widget.TextView;
 
 public class Account{
 	
 	public static Account INSTANCE = new Account();
+	
 	private MainActivity activity;
 	private String username;
 	private int userID;
 	private int myPreference;
-	private ArrayList<Integer> selectedItems = new ArrayList<Integer>();
+	
+	private ArrayList<Integer> originalSelectedItems = new ArrayList<Integer>();
+	private ArrayList<Integer> newSelectedItems		 = new ArrayList<Integer>();
+	private ArrayList<Integer> selectedItems 		 = new ArrayList<Integer>();
 	private boolean[] checkedItems = new boolean[8]; 
-	private ArrayList<EventInfo> myEventList = new ArrayList<EventInfo>();
+	
+	private ArrayList<EventInfo> myEventList 		 = new ArrayList<EventInfo>();
 
 	public static void updateAccount(MainActivity a, int id, String name, String pwd, int preference)
 	{
 		getInstance().activity 		= a;
-		getInstance().userID			= id;
+		getInstance().userID		= id;
 		getInstance().username 		= name;
 		getInstance().myPreference 	= preference;
+		getInstance().myEventList	.clear();
+		getInstance().selectedItems .clear();
 		getInstance().parceMyPreference();
-		getInstance().myEventList.clear();
 	}
 	
 	private void parceMyPreference() {
@@ -51,9 +46,19 @@ public class Account{
 
 	public void showMyPreference()
 	{
+		// Temp arrayList
 		// Convert item id to boolean check bit
+		originalSelectedItems = new ArrayList<Integer>();
+		newSelectedItems      = new ArrayList<Integer>();
 		for(int i = 0; i < 7; ++i){
-			checkedItems[i] = ((selectedItems.contains(i))? true : false);
+			if(selectedItems.contains(i)){
+				checkedItems[i] = true;
+				originalSelectedItems.add(i);
+				newSelectedItems     .add(i);
+			}else{
+				checkedItems[i] = false;
+			}
+			
 		}
 		new AlertDialog.Builder(activity)
 	    // Set the dialog title
@@ -66,10 +71,10 @@ public class Account{
            public void onClick(DialogInterface dialog, int which, boolean isChecked) {
                if (isChecked) {
                    // If the user checked the item, add it to the selected items
-            	   selectedItems.add(which);
+            	   newSelectedItems.add(which);
                } else if (selectedItems.contains(which)) {
                    // Else, if the item is already in the array, remove it 
-            	   selectedItems.remove(Integer.valueOf(which));
+            	   newSelectedItems.remove(Integer.valueOf(which));
                }
            }
        })
@@ -79,13 +84,14 @@ public class Account{
            public void onClick(DialogInterface dialog, int id) {
                // User clicked OK, so save the mSelectedItems results somewhere
                // or return them to the component that opened the dialog
+        	   selectedItems = newSelectedItems;
         	   updateMyPreference();
            }
        })
        .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
            @Override
            public void onClick(DialogInterface dialog, int id) {
-
+        	   selectedItems = originalSelectedItems;
            }
        }).show();
 	}
@@ -94,9 +100,11 @@ public class Account{
 	{
 		int newPreference = 0;
 		for(Integer i : selectedItems){
-			newPreference = (int) Math.pow(2, i.intValue());
+			newPreference += (int) Math.pow(2, i.intValue());
 		}
 		myPreference = newPreference;
+		// Update database!!
+		new DBConnector().execute("UPDATE userlist SET Preference = " + myPreference + " WHERE ID = " + userID);
 	}
 
 	public void addMyEvent(EventInfo event)

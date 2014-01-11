@@ -90,8 +90,8 @@ super.onCreate(savedInstanceState);
         infoDialog.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				// me.showMyPreference();
-				Account.getInstance().showMyEvent();
+				Account.getInstance().showMyPreference();
+				//Account.getInstance().showMyEvent();
 			}
 		});
     }

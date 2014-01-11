@@ -2,26 +2,26 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:orientation="vertical" >      
+    android:orientation="horizontal" >
 
     <Button
-        android:id="@+id/get_record"
+        android:id="@+id/map_activity"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:text="MAP" />
-    
-     <Button
-	    android:id="@+id/get_info"
-	    android:layout_height="wrap_content"
-	    android:layout_width="wrap_content"
-	    android:text="Info Dialog Test"
-	    android:layout_toRightOf="@id/get_record" />
-
 
     <TableLayout
         android:id="@+id/user_list"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_width="203dp"
+        android:layout_height="wrap_content" >
+
+        <Button
+            android:id="@+id/get_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Info Dialog Test" />
+
+    </TableLayout>
 
 </LinearLayout>

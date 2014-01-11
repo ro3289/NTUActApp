@@ -40,7 +40,7 @@ public class MapActivity extends Activity implements OnInfoWindowClickListener{
     private Button startDateButton, endDateButton, searchButton, resetButton;
     private Calendar calendar;
     private int mYear, mMonth, mDay;
-    private String dateText, startDate, endDate;
+    private String startDate, endDate;
     private TextView startDateText, endDateText;
     
     private Button tagButton;
@@ -211,7 +211,7 @@ public class MapActivity extends Activity implements OnInfoWindowClickListener{
 						                     }
 						                 }  
 							     	}
-             // 設置初始日期  
+             // Default by current date
              , c.get(Calendar.YEAR) , c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH))
 	     .show();  
 	}

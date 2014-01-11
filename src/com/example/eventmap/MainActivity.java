@@ -9,13 +9,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.example.eventdialog.EventDialog;
-
 import android.app.ActionBar.LayoutParams;
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.StrictMode;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentTabHost;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
@@ -23,15 +22,41 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
-public class MainActivity extends Activity {
+import com.example.eventdialog.EventDialog;
+
+public class MainActivity extends FragmentActivity {
 
 	private Account me;
 	public ArrayList<EventInfo> eventList = new ArrayList<EventInfo>();
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+super.onCreate(savedInstanceState);
+		
+		setContentView(R.layout.activity_main);
+	
+		FragmentTabHost tabHost = (FragmentTabHost)findViewById(android.R.id.tabhost);
+		tabHost.setup(this, getSupportFragmentManager(), R.id.realtabcontent);
+		//1
+		tabHost.addTab(tabHost.newTabSpec("Apple")
+			   				  .setIndicator("Apple"), 
+   					  AppleFragment.class, 
+   					  null);
+	    //2
+		tabHost.addTab(tabHost.newTabSpec("Google")
+				   			  .setIndicator("Google"), 
+					  GoogleFragment.class, 
+					  null);
+	    //3
+		tabHost.addTab(tabHost.newTabSpec("Facebook")
+				   			  .setIndicator("Facebook"), 
+					  FacebookFragment.class, 
+				      null);
+	    //4
+		tabHost.addTab(tabHost.newTabSpec("Twitter")
+			   				  .setIndicator("Twitter"), 
+					  TwitterFragment.class, 
+					  null);
         
         StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()  
         .detectDiskReads()  
@@ -149,10 +174,9 @@ public class MainActivity extends Activity {
 			e.printStackTrace();
 		}
     }
-    
+  /*  
     private void getActivitiesRecords() {
-        // TODO Auto-generated method stub
-        System.out.println("herehere");
+
         TableLayout user_list = (TableLayout)findViewById(R.id.user_list);
         user_list.setStretchAllColumns(true);
         TableLayout.LayoutParams row_layout = new TableLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
@@ -165,6 +189,7 @@ public class MainActivity extends Activity {
                                                         只有一筆資料時直接建立JSONObject物件
                 JSONObject jsonData = new JSONObject(result);
             */
+    /*
             JSONArray jsonArray = new JSONArray(result);
             for(int i = 0; i < jsonArray.length(); i++) {
                 JSONObject jsonData = jsonArray.getJSONObject(i);
@@ -187,7 +212,23 @@ public class MainActivity extends Activity {
         } catch(Exception e) {
             // Log.e("log_tag", e.toString());
         }
-    }
+    }*/
+    
+	public String getAppleData(){
+		return "Apple 123";
+	}
+
+	public String getGoogleData(){
+		return "Google 456";
+	}
+	
+	public String getFacebookData(){
+		return "Facebook 789";
+	}
+	
+	public String getTwitterData(){
+		return "Twitter abc";
+	}
     
     protected void onActivityResult(int requestCode, int resultCode, Intent data) 
     {

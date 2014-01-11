@@ -1,6 +1,8 @@
 package com.example.eventmap;
 
+import java.awt.Event;
 import java.util.ArrayList;
+
 
 
 
@@ -14,6 +16,7 @@ import android.widget.TextView;
 
 public class Account{
 	
+	public static Account INSTANCE = new Account();
 	private MainActivity activity;
 	private String username;
 	private int userID;
@@ -22,13 +25,14 @@ public class Account{
 	private boolean[] checkedItems = new boolean[8]; 
 	private ArrayList<EventInfo> myEventList = new ArrayList<EventInfo>();
 
-	public Account(MainActivity a, int id, String name, String pwd, int preference)
+	public static void updateAccount(MainActivity a, int id, String name, String pwd, int preference)
 	{
-		activity 		= a;
-		userID			= id;
-		username 		= name;
-		myPreference 	= preference;
-		this.parceMyPreference();
+		getInstance().activity 		= a;
+		getInstance().userID			= id;
+		getInstance().username 		= name;
+		getInstance().myPreference 	= preference;
+		getInstance().parceMyPreference();
+		getInstance().myEventList.clear();
 	}
 	
 	private void parceMyPreference() {
@@ -119,5 +123,9 @@ public class Account{
             }
         })
         .show();
+	}
+	
+	public static Account getInstance(){
+		return INSTANCE;
 	}
 }

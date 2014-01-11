@@ -69,7 +69,6 @@ public class FacebookFragment extends ListFragment {
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 		Log.d("=====>", "FacebookFragment onActivityCreated");
-		
 		/*
 		listAdapter = new ArrayAdapter<String>(mainActivity, android.R.layout.activity_list_item,month);
 		setListAdapter(listAdapter);

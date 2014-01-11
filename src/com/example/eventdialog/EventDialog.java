@@ -14,7 +14,6 @@ import com.example.eventmap.R;
 public class EventDialog {
 	
 	private static final EventDialog Instance = new EventDialog();
-	
 	public Activity activity;
 	
 	public static void setUpEventDialog(Activity a){

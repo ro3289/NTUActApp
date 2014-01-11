@@ -26,7 +26,6 @@ import com.example.eventdialog.EventDialog;
 
 public class MainActivity extends FragmentActivity {
 
-	private Account me;
 	public ArrayList<EventInfo> eventList = new ArrayList<EventInfo>();
 	
     @Override
@@ -89,7 +88,7 @@ super.onCreate(savedInstanceState);
 			@Override
 			public void onClick(View v) {
 				// me.showMyPreference();
-				me.showMyEvent();
+				Account.getInstance().showMyEvent();
 			}
 		});
     }
@@ -106,7 +105,7 @@ super.onCreate(savedInstanceState);
 				String username   = jsonArray.getJSONObject(0).getString("Username");
 				String password   = jsonArray.getJSONObject(0).getString("Password");
 				int    preference = jsonArray.getJSONObject(0).getInt("Preference");
-				me = new Account(this, id, username, password, preference);
+				Account.updateAccount(this, id, username, password, preference);
 			}
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
@@ -125,7 +124,7 @@ super.onCreate(savedInstanceState);
 			for(int index = 0; index < jsonArray.length(); ++index)
 			{
 				int eventID = jsonArray.getJSONObject(index).getInt("ActID");
-				me.addMyEvent(eventList.get(eventID));
+				Account.getInstance().addMyEvent(eventList.get(eventID));
 			}
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
@@ -228,9 +227,4 @@ super.onCreate(savedInstanceState);
 	public String getTwitterData(){
 		return "Twitter abc";
 	}
-    
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) 
-    {
-    	EventDialog.getInstance().setUpEventDialog(this);
-    }
 }

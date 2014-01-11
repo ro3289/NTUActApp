@@ -1,10 +1,18 @@
-package com.example.eventmap;
+package com.example.util;
 
+import java.awt.Event;
 import java.util.ArrayList;
 
 
 
-import com.example.eventdialog.EventDialog;
+
+
+
+
+import com.example.eventmap.MainActivity;
+import com.example.eventmap.R;
+import com.example.eventmap.R.array;
+import com.example.eventmap.R.string;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -14,6 +22,7 @@ import android.widget.TextView;
 
 public class Account{
 	
+	public static Account INSTANCE = new Account();
 	private MainActivity activity;
 	private String username;
 	private int userID;
@@ -22,13 +31,14 @@ public class Account{
 	private boolean[] checkedItems = new boolean[8]; 
 	private ArrayList<EventInfo> myEventList = new ArrayList<EventInfo>();
 
-	public Account(MainActivity a, int id, String name, String pwd, int preference)
+	public static void updateAccount(MainActivity a, int id, String name, String pwd, int preference)
 	{
-		activity 		= a;
-		userID			= id;
-		username 		= name;
-		myPreference 	= preference;
-		this.parceMyPreference();
+		getInstance().activity 		= a;
+		getInstance().userID			= id;
+		getInstance().username 		= name;
+		getInstance().myPreference 	= preference;
+		getInstance().parceMyPreference();
+		getInstance().myEventList.clear();
 	}
 	
 	private void parceMyPreference() {
@@ -96,18 +106,14 @@ public class Account{
 	
 	public void showMyEvent()
 	{
-		ArrayList<String> myEventItemsList = new ArrayList<String>();
-		for(EventInfo event : myEventList)
-		{
-			myEventItemsList.add(event.name);
-		}
-		String[] myEventItems = myEventItemsList.toArray(new String[myEventItemsList.size()]);
+		String[] myEventItems = getEventNameStringArray();
+		
     	new AlertDialog.Builder(activity)
         .setTitle(R.string.my_events)
         .setItems(myEventItems, new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
-				EventDialog.getInstance().showDialog(myEventList.get(which));
+				EventDialog.getInstance().showEventInfoDialog(myEventList.get(which));
 			}
 		})
         .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
@@ -119,5 +125,22 @@ public class Account{
             }
         })
         .show();
+	}
+	
+	public static Account getInstance(){
+		return INSTANCE;
+	}
+	
+	public String[] getEventNameStringArray(){
+		ArrayList<String> myEventItemsList = new ArrayList<String>();
+		for(EventInfo event : myEventList)
+		{
+			myEventItemsList.add(event.name);
+		}
+		return myEventItemsList.toArray(new String[myEventItemsList.size()]);
+	}
+	
+	public EventInfo getEvent(int which){
+		return myEventList.get(which);
 	}
 }

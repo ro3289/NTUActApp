@@ -23,7 +23,9 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.TextView;
 
-import com.example.eventdialog.EventDialog;
+import com.example.util.DBConnector;
+import com.example.util.EventDialog;
+import com.example.util.EventInfo;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
@@ -192,7 +194,7 @@ public class MapActivity extends Activity implements OnInfoWindowClickListener{
 	// Listener
 	@Override
 	public void onInfoWindowClick(Marker marker) {
-		EventDialog.getInstance().showDialog(eventHashMap.get(marker));
+		EventDialog.getInstance().showEventInfoDialog(eventHashMap.get(marker));
 	}
 	
 	public void dateSelectDialog(final boolean setEnd) {

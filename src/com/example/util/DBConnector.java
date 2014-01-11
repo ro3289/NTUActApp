@@ -1,4 +1,4 @@
-package com.example.eventmap;
+package com.example.util;
 
 import java.io.BufferedReader;
 import java.io.InputStream;

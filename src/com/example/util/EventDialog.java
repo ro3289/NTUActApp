@@ -1,4 +1,4 @@
-package com.example.eventdialog;
+package com.example.util;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -7,21 +7,19 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
 
-import com.example.eventmap.EventInfo;
 import com.example.eventmap.R;
 
 
 public class EventDialog {
 	
 	private static final EventDialog Instance = new EventDialog();
-	
 	public Activity activity;
 	
 	public static void setUpEventDialog(Activity a){
 		getInstance().activity = a;
 	}
 	
-	public void showDialog(EventInfo event) {
+	public void showEventInfoDialog(EventInfo event) {
     	LayoutInflater layoutInflater = activity.getLayoutInflater();
 		final View inflater = layoutInflater.inflate(R.layout.event_dialog, null) ;
 		((TextView) inflater.findViewById(R.id.eventname)).setText(event.name);

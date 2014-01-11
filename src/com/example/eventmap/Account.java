@@ -11,21 +11,40 @@ public class Account{
 	
 	private Activity activity;
 	private String username;
+	private int userID;
 	private int myPreference;
 	private ArrayList<Integer> selectedItems = new ArrayList<Integer>();
-	private Builder preferenceDialog;
+	private boolean[] checkedItems = new boolean[8]; 
 
-	public Account(Activity a, String name, int preference)
+	public Account(Activity a, int id, String name, String pwd, int preference)
 	{
 		activity 		= a;
+		userID			= id;
 		username 		= name;
 		myPreference 	= preference;
-		preferenceDialog = new AlertDialog.Builder(activity)
+		this.parceMyPreference();
+	}
+	
+	private void parceMyPreference() {
+		for(int i = 0; i < 7; ++i){
+			if(((myPreference >> i) & 1) == 1){
+				selectedItems.add(i);
+			}
+		}
+	}
+
+	public void showMyPreference()
+	{
+		// Convert item id to boolean check bit
+		for(int i = 0; i < 7; ++i){
+			checkedItems[i] = ((selectedItems.contains(i))? true : false);
+		}
+		new AlertDialog.Builder(activity)
 	    // Set the dialog title
 	    .setTitle(R.string.select_tags)
 	    // Specify the list array, the items to be selected by default (null for none),
 	    // and the listener through which to receive callbacks when items are selected
-       .setMultiChoiceItems(R.array.tags, null,
+       .setMultiChoiceItems(R.array.tags, checkedItems,
                   new DialogInterface.OnMultiChoiceClickListener() {
            @Override
            public void onClick(DialogInterface dialog, int which, boolean isChecked) {
@@ -45,20 +64,14 @@ public class Account{
                // User clicked OK, so save the mSelectedItems results somewhere
                // or return them to the component that opened the dialog
         	   updateMyPreference();
-        	   selectedItems.clear();
            }
        })
        .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
            @Override
            public void onClick(DialogInterface dialog, int id) {
-        	   selectedItems.clear();
+
            }
-       });
-	}
-	
-	public void showMyPreference()
-	{
-		preferenceDialog.show();
+       }).show();
 	}
 	
 	private void updateMyPreference()

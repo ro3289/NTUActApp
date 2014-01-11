@@ -23,15 +23,14 @@ import android.widget.TextView;
 
 public class MainActivity extends Activity {
 
-	ArrayList<EventInfo> eventList = new ArrayList<EventInfo>();
+	private Account me;
+	private ArrayList<EventInfo> eventList = new ArrayList<EventInfo>();
+	
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        
-        findViews();
-        setListeners();
         
         StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()  
         .detectDiskReads()  
@@ -46,36 +45,52 @@ public class MainActivity extends Activity {
         .build());
 
         // getActivitiesRecords();
-        getEventInfo();
+        this.getEventInfo();
+        this.getUserInfo();
+
+        Button mapActivity = (Button)findViewById(R.id.map_activity);
+        mapActivity.setOnClickListener(new Button.OnClickListener() {
+            public void onClick(View v) {
+                Intent myIntent=new Intent(v.getContext(), MapActivity.class);
+                startActivity(myIntent);
+                finish();
+            }
+        });
         
+        // Test for dialog
         Button infoDialog = (Button) findViewById(R.id.get_info);
         infoDialog.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				
+				me.showMyPreference();
 			}
 		});
     }
    
     
-    private Button button_get_record;
-    
-    private void findViews() {
-        button_get_record = (Button)findViewById(R.id.get_record);
-    }
-    
-    private void setListeners() {
-        button_get_record.setOnClickListener(getDBRecord);
-    }
-    
-    private Button.OnClickListener getDBRecord = new Button.OnClickListener() {
-        public void onClick(View v) {
-//            getActivitiesRecords();
-            Intent myIntent=new Intent(v.getContext(), MapActivity.class);
-            startActivity(myIntent);
-            finish();
-        }
-    };
+    private void getUserInfo() {
+    	try {
+			String resultData = new DBConnector().execute("SELECT * FROM userlist").get();
+			JSONArray jsonArray = new JSONArray(resultData);
+			if(jsonArray.length() != 0)
+			{
+				int    id 	      = jsonArray.getJSONObject(0).getInt("ID");
+				String username   = jsonArray.getJSONObject(0).getString("Username");
+				String password   = jsonArray.getJSONObject(0).getString("Password");
+				int    preference = jsonArray.getJSONObject(0).getInt("Preference");
+				me = new Account(this, id, username, password, preference);
+			}
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
     private void getEventInfo()
     {

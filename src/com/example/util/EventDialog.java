@@ -7,12 +7,15 @@ import java.util.List;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.eventmap.FacebookFragment;
 import com.example.eventmap.R;
@@ -86,7 +89,13 @@ public class EventDialog {
         .setPositiveButton(R.string.visit,
             new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int whichButton) {
-                	
+                	if(!event.url.equals("")){
+	                	Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(event.url));
+	    	        	activity.startActivity(browserIntent);
+                	}else{
+                		Toast.makeText(activity.getApplicationContext(), "此活動目前無專頁",
+                				   Toast.LENGTH_SHORT).show();
+                	}
                 }
             }
         )

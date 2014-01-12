@@ -10,5 +10,7 @@
     <string name="my_events">我的活動</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
+    <string name="visit">前往專頁</string>
+    <string name="exit">離開</string>
 
 </resources>

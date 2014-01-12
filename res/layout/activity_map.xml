@@ -10,46 +10,47 @@
         android:layout_height="match_parent"
         class="com.google.android.gms.maps.MapFragment" />
     <Button 
-        android:id="@+id/startDateButton"
-        android:layout_width="wrap_content" 
-        android:layout_height="wrap_content" 
-        android:text="StartDate" />
-    <Button 
-        android:id="@+id/endDateButton"
-        android:layout_width="wrap_content" 
-        android:layout_height="wrap_content" 
-        android:text="EndDate" 
-        android:layout_toRightOf = "@id/startDateButton"/>
-    <Button 
-        android:id="@+id/searchButton"
-        android:layout_width="wrap_content" 
-        android:layout_height="wrap_content" 
-        android:text="Search" 
-        android:layout_toRightOf="@id/endDateButton"/>
-    <Button 
-        android:id="@+id/resetButton"
-        android:layout_width="wrap_content" 
-        android:layout_height="wrap_content" 
-        android:text="Reset" 
-        android:layout_toRightOf="@id/searchButton"/>
-    
-    <TextView  
-        android:id="@+id/startDateText"
-	    android:layout_width="fill_parent" 
-	    android:layout_height="wrap_content" 
-	    android:layout_below="@id/startDateButton"/>
-    <TextView  
-        android:id="@+id/endDateText"
-	    android:layout_width="fill_parent" 
-	    android:layout_height="wrap_content" 
-	    android:layout_below="@id/endDateButton"
-	    android:layout_toRightOf="@id/startDateText"/>
-    
-    <Button 
-        android:id="@+id/tagButton"
+        android:id="@+id/tag_button"
         android:layout_width="wrap_content" 
         android:layout_height="wrap_content" 
         android:text="Tag" 
-        android:layout_toRightOf="@id/resetButton"/>
+        android:layout_alignParentRight="true"/>
+    
+    <Button 
+        android:id="@+id/start_date_button"
+        android:layout_width="wrap_content" 
+        android:layout_height="wrap_content" 
+        android:text="Start" />
+    <Button 
+        android:id="@+id/end_date_button"
+        android:layout_width="wrap_content" 
+        android:layout_height="wrap_content" 
+        android:text="End" 
+        android:layout_toRightOf = "@id/start_date_button"/>
+    <Button 
+        android:id="@+id/search_button"
+        android:layout_width="wrap_content" 
+        android:layout_height="wrap_content" 
+        android:text="Search" 
+        android:layout_toRightOf="@id/end_date_button"/>
+    <Button 
+        android:id="@+id/reset_button"
+        android:layout_width="wrap_content" 
+        android:layout_height="wrap_content" 
+        android:text="Reset" 
+        android:layout_toRightOf="@id/search_button"/>
+    
+    <TextView  
+        android:id="@+id/start_date_text"
+	    android:layout_width="fill_parent" 
+	    android:layout_height="wrap_content" 
+	    android:layout_below="@id/start_date_button"/>
+    <TextView  
+        android:id="@+id/end_date_text"
+	    android:layout_width="fill_parent" 
+	    android:layout_height="wrap_content" 
+	    android:layout_below="@id/end_date_button"
+	    android:layout_toRightOf="@id/start_date_text"/>
+    
     
 </RelativeLayout>

@@ -10,16 +10,18 @@ public class EventInfo {
 	public String  	snippet;
 	public String  	location;
 	public String 	url;
+	public String 	image;
 	public String  	content;
 	private Calendar cal;
 	private int 	tagValue;
 	
-	public EventInfo(int ID, String Name, String Location, String u, String Content, Date date, int tag)
+	public EventInfo(int ID, String Name, String Location, String u, String i, String Content, Date date, int tag)
 	{
 		id = ID;
 		name = Name;
 		location = Location;
 		url = u;
+		image = i;
 		content = Content;
 		cal = Calendar.getInstance();
 		cal.setTime(date);

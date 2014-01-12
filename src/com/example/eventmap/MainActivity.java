@@ -151,12 +151,13 @@ public class MainActivity extends FragmentActivity {
 				int    ID 	    = jsonArray.getJSONObject(index).getInt("ID");
 				String name 	= jsonArray.getJSONObject(index).getString("Name");
 				String location = jsonArray.getJSONObject(index).getString("Location");
-				String url 		= jsonArray.getJSONObject(index).getString("url");
+				String url 		= jsonArray.getJSONObject(index).getString("Url");
+				String image	= jsonArray.getJSONObject(index).getString("ImageUrl");
 				String content 	= jsonArray.getJSONObject(index).getString("Content");
 				String date 	= jsonArray.getJSONObject(index).getString("Time");
 				int    tag 	    = jsonArray.getJSONObject(index).getInt("Tag");
 				try {
-					eventList.add(ID, new EventInfo(ID, name, location, url, content, sdf.parse(date), tag));
+					eventList.add(ID, new EventInfo(ID, name, location, url, image, content, sdf.parse(date), tag));
 				} catch (ParseException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

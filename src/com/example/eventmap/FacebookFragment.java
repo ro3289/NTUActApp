@@ -30,18 +30,13 @@ import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
 
 public class FacebookFragment extends ListFragment {
 
-	private MainActivity mainActivity;
 	private ImageLoader imageLoader = ImageLoader.getInstance();
 	private DisplayImageOptions options;
 	private MyListAdapter myListAdapter;
-	private String[] myEvent;
-    public static final String[] IMAGES = new String[] {
-		// 大圖片們
-		"http://140.112.18.223/activity1.jpg"
-		//"http://140.112.18.223/liver_baby.png",
-		// 小圖片們
-		
-	};
+	// Load events and images from Account
+	private String[] myEventName;
+	private String[] myEventContent;
+    private String[] myEventImage;
 	
 	public class MyListAdapter extends ArrayAdapter<String> {
 		
@@ -52,29 +47,31 @@ public class FacebookFragment extends ListFragment {
 		  super(context, textViewResourceId, objects);
 		  myContext = context;
 	  }
-	
-	  @Override
-	  public View getView(int position, View convertView, ViewGroup parent) {
-	   //return super.getView(position, convertView, parent);
-	   
-	   LayoutInflater inflater = (LayoutInflater)myContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-	   View row = inflater.inflate(R.layout.listview_preference, parent, false);
-	   
-	   TextView eventName=(TextView)row.findViewById(R.id.event_name);
-	   eventName.setText(myEvent[position]);
-	   
-	   ImageView image=(ImageView)row.findViewById(R.id.image);
-	   imageLoader.displayImage(IMAGES[position], image, options, animateFirstListener);
-	   
-	   return row;
-  }
+		  @Override
+		  public View getView(int position, View convertView, ViewGroup parent) {
+		   
+		   LayoutInflater inflater = (LayoutInflater)myContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		   View row = inflater.inflate(R.layout.listview_myevent, parent, false);
+		   
+		   TextView eventName = (TextView)row.findViewById(R.id.event_name);
+		   eventName.setText(myEventName[position]);
+		   
+		   TextView eventContent = (TextView)row.findViewById(R.id.event_content);
+		   eventContent.setText(myEventContent[position]);
+		   
+		   ImageView image=(ImageView)row.findViewById(R.id.image);
+		   imageLoader.displayImage(myEventImage[position], image, options, animateFirstListener);
+		   
+		   return row;
+		  }
 	}
 	@Override
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
 		Log.d("=====>", "FacebookFragment onAttach");
-		mainActivity = (MainActivity)activity;
-		myEvent = Account.getInstance().getEventNameStringArray();
+		myEventName		= Account.getInstance().getEventNameStringArray();
+		myEventContent 	= Account.getInstance().getEventContentStringArray();
+		myEventImage 	= Account.getInstance().getEventImageStringArray();
 		// Set up image display options
 		options = new DisplayImageOptions.Builder()
     	.showStubImage(R.drawable.ic_stub)
@@ -104,7 +101,7 @@ public class FacebookFragment extends ListFragment {
     	.defaultDisplayImageOptions(options)
     	.build();
 		imageLoader.init(config);
-		myListAdapter = new MyListAdapter(getActivity(), R.layout.listview_preference, myEvent);
+		myListAdapter = new MyListAdapter(getActivity(), R.layout.listview_myevent, myEventName);
 		setListAdapter(myListAdapter);
 	}
 	
@@ -135,8 +132,10 @@ public class FacebookFragment extends ListFragment {
 		}
 	
 	public void updateEventList(){
-		myEvent = Account.getInstance().getEventNameStringArray();
-		myListAdapter = new MyListAdapter(getActivity(), R.layout.listview_preference, myEvent);
+		myEventName		= Account.getInstance().getEventNameStringArray();
+		myEventContent 	= Account.getInstance().getEventContentStringArray();
+		myEventImage 	= Account.getInstance().getEventImageStringArray();
+		myListAdapter = new MyListAdapter(getActivity(), R.layout.listview_myevent, myEventName);
 		setListAdapter(myListAdapter);
 	}
 	

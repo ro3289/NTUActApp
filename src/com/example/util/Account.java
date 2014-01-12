@@ -106,12 +106,7 @@ public class Account{
 		// Update database!!
 		new DBConnector().execute("UPDATE userlist SET Preference = " + myPreference + " WHERE ID = " + userID);
 	}
-
-	public void addMyEvent(EventInfo event)
-	{
-		myEventList.add(event);
-	}
-	
+	/*
 	public void showMyEvent()
 	{
 		String[] myEventItems = getEventNameStringArray();
@@ -121,7 +116,7 @@ public class Account{
         .setItems(myEventItems, new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
-				EventDialog.getInstance().showEventInfoDialog(myEventList.get(which));
+				EventDialog.getInstance().showEventInfoDialog(myEventList.get(which), null);
 			}
 		})
         .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
@@ -134,6 +129,7 @@ public class Account{
         })
         .show();
 	}
+	*/
 	
 	public static Account getInstance(){
 		return INSTANCE;
@@ -148,7 +144,30 @@ public class Account{
 		return myEventItemsList.toArray(new String[myEventItemsList.size()]);
 	}
 	
+	public void addMyEvent(EventInfo event)
+	{
+		myEventList.add(event);
+	}
+	
+	public void deleteMyEvent(EventInfo event)
+	{
+		myEventList.remove(event);
+	}
+	
 	public EventInfo getEvent(int which){
 		return myEventList.get(which);
+	}
+	
+	public boolean containEvent(EventInfo event){
+		for(EventInfo e : myEventList){
+			if(e.id == event.id){
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public int getUserID(){
+		return userID;
 	}
 }

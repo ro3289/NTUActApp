@@ -194,7 +194,7 @@ public class MapActivity extends Activity implements OnInfoWindowClickListener{
 	// Listener
 	@Override
 	public void onInfoWindowClick(Marker marker) {
-		EventDialog.getInstance().showEventInfoDialog(eventHashMap.get(marker));
+		EventDialog.getInstance().showEventInfoDialog(eventHashMap.get(marker), null);
 	}
 	
 	public void dateSelectDialog(final boolean setEnd) {

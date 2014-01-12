@@ -23,7 +23,8 @@ public class FacebookFragment extends ListFragment {
 	private String value = "";
 	private ListView listView;
 	private ArrayAdapter<String> listAdapter;
-	private String[] myEvent = Account.getInstance().getEventNameStringArray();
+	private String[] myEvent;
+	private MyListAdapter myListAdapter;
 	
 	public class MyListAdapter extends ArrayAdapter<String> {
 		  
@@ -58,6 +59,7 @@ public class FacebookFragment extends ListFragment {
 		Log.d("=====>", "FacebookFragment onAttach");
 		mainActivity = (MainActivity)activity;
 		value = mainActivity.getFacebookData();
+		myEvent = Account.getInstance().getEventNameStringArray();
 	}
 	
 	@Override
@@ -75,15 +77,19 @@ public class FacebookFragment extends ListFragment {
 		listAdapter = new ArrayAdapter<String>(mainActivity, android.R.layout.activity_list_item,month);
 		setListAdapter(listAdapter);
 		*/
-		MyListAdapter myListAdapter = new MyListAdapter(getActivity(), R.layout.listview_preference, myEvent);
+		myListAdapter = new MyListAdapter(getActivity(), R.layout.listview_preference, myEvent);
 		setListAdapter(myListAdapter);
 	}
 	
 	@Override
 	 public void onListItemClick(ListView l, View v, int position, long id) {
 		super.onListItemClick(l, v, position, id);
-		EventDialog.getInstance().showEventInfoDialog(Account.getInstance().getEvent(position));
+		EventDialog.getInstance().showEventInfoDialog(Account.getInstance().getEvent(position), this);
 	 }
-
 	
+	public void updateEventList(){
+		myEvent = Account.getInstance().getEventNameStringArray();
+		myListAdapter = new MyListAdapter(getActivity(), R.layout.listview_preference, myEvent);
+		setListAdapter(myListAdapter);
+	}
 }

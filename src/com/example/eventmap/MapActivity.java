@@ -46,7 +46,10 @@ public class MapActivity extends Activity implements OnInfoWindowClickListener{
     private TextView startDateText, endDateText;
     
     private Button tagButton;
-    private final ArrayList<Integer> mSelectedItems = new ArrayList<Integer>();  // Where we track the selected items
+	private ArrayList<Integer> originalSelectedItems = new ArrayList<Integer>();
+	private ArrayList<Integer> newSelectedItems		 = new ArrayList<Integer>();
+	private ArrayList<Integer> selectedItems 		 = new ArrayList<Integer>();
+	private boolean[] checkedItems = new boolean[8]; 
 	private final ArrayList<Marker> dateFilterResult = new ArrayList<Marker>();  
 	
 	// Test event location stub
@@ -165,12 +168,11 @@ public class MapActivity extends Activity implements OnInfoWindowClickListener{
 	{
 		// Compute tag value
 		int tag = 0;
-		for(Integer i: mSelectedItems)
+		for(Integer i: selectedItems)
 		{
 			tag += Math.pow(2,i.intValue());
 			System.out.println(tag);
 		}
-		mSelectedItems.clear();
 		for(Marker marker : dateFilterResult)
 		{
 			if((eventHashMap.get(marker).getTagValue() & tag) == tag)
@@ -228,19 +230,20 @@ public class MapActivity extends Activity implements OnInfoWindowClickListener{
         startDate = new String(mYear +"-" + mMonth + "-" + mDay);
         endDate = new String(mYear +"-" + mMonth + "-" + mDay);
         
-        startDateText = (TextView)findViewById(R.id.startDateText);
-        endDateText = (TextView)findViewById(R.id.endDateText);
+        startDateText = (TextView)findViewById(R.id.start_date_text);
+        endDateText = (TextView)findViewById(R.id.end_date_text);
 	}
+	
 	private void setButton()
 	{
-		startDateButton = (Button)findViewById(R.id.startDateButton);
+		startDateButton = (Button)findViewById(R.id.start_date_button);
         startDateButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
                 dateSelectDialog(false);
             }
         });
-        endDateButton = (Button)findViewById(R.id.endDateButton);
+        endDateButton = (Button)findViewById(R.id.end_date_button);
         endDateButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
@@ -248,14 +251,14 @@ public class MapActivity extends Activity implements OnInfoWindowClickListener{
                
             }
         });
-        searchButton = (Button)findViewById(R.id.searchButton);
+        searchButton = (Button)findViewById(R.id.search_button);
         searchButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
             	dateFilter(startDate, endDate);
             }
         });
-        resetButton = (Button)findViewById(R.id.resetButton);
+        resetButton = (Button)findViewById(R.id.reset_button);
         resetButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
@@ -263,26 +266,37 @@ public class MapActivity extends Activity implements OnInfoWindowClickListener{
             }
         });
         
-        tagButton = (Button)findViewById(R.id.tagButton);
+        tagButton = (Button)findViewById(R.id.tag_button);
         tagButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
-            	
+            	originalSelectedItems = new ArrayList<Integer>();
+        		newSelectedItems      = new ArrayList<Integer>();
+        		for(int i = 0; i < 7; ++i){
+        			if(selectedItems.contains(i)){
+        				checkedItems[i] = true;
+        				originalSelectedItems.add(i);
+        				newSelectedItems     .add(i);
+        			}else{
+        				checkedItems[i] = false;
+        			}
+        			
+        		}
         	    new AlertDialog.Builder(MapActivity.this)
         	    // Set the dialog title
         	    .setTitle(R.string.select_tags)
         	    // Specify the list array, the items to be selected by default (null for none),
         	    // and the listener through which to receive callbacks when items are selected
-	           .setMultiChoiceItems(R.array.tags, null,
+	           .setMultiChoiceItems(R.array.tags, checkedItems,
 	                      new DialogInterface.OnMultiChoiceClickListener() {
 	               @Override
 	               public void onClick(DialogInterface dialog, int which, boolean isChecked) {
 	                   if (isChecked) {
 	                       // If the user checked the item, add it to the selected items
-	                       mSelectedItems.add(which);
-	                   } else if (mSelectedItems.contains(which)) {
+	                       newSelectedItems.add(which);
+	                   } else if (newSelectedItems.contains(which)) {
 	                       // Else, if the item is already in the array, remove it 
-	                       mSelectedItems.remove(Integer.valueOf(which));
+	                       newSelectedItems.remove(Integer.valueOf(which));
 	                   }
 	               }
 	           })
@@ -292,15 +306,14 @@ public class MapActivity extends Activity implements OnInfoWindowClickListener{
 	               public void onClick(DialogInterface dialog, int id) {
 	                   // User clicked OK, so save the mSelectedItems results somewhere
 	                   // or return them to the component that opened the dialog
-	            	   if(!mSelectedItems.isEmpty()){
-		            	   // Show marker by tag value
-		            	   tagFilter();
-	            	   }
+	            	   selectedItems = newSelectedItems;
+	            	   tagFilter();
 	               }
 	           })
 	           .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
 	               @Override
 	               public void onClick(DialogInterface dialog, int id) {
+	            	   selectedItems = originalSelectedItems;
 	               }
 	           }).show();
             }

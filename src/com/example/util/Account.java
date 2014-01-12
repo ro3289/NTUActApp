@@ -136,14 +136,34 @@ public class Account{
 	}
 	
 	public String[] getEventNameStringArray(){
-		ArrayList<String> myEventItemsList = new ArrayList<String>();
+		ArrayList<String> myEventNameList 	 = new ArrayList<String>();
 		for(EventInfo event : myEventList)
 		{
-			myEventItemsList.add(event.name);
+			myEventNameList.add(event.name);
 		}
-		return myEventItemsList.toArray(new String[myEventItemsList.size()]);
+		return myEventNameList.toArray(new String[myEventNameList.size()]);
 	}
 	
+	public String[] getEventContentStringArray(){
+		ArrayList<String> myEventContentList = new ArrayList<String>();
+		for(EventInfo event : myEventList)
+		{
+			myEventContentList.add(event.content);
+		}
+		 return myEventContentList.toArray(new String[myEventContentList.size()]);
+	}
+	
+	public String[] getEventImageStringArray(){
+		ArrayList<String> myEventImageList   = new ArrayList<String>();
+		for(EventInfo event : myEventList)
+		{
+			myEventImageList.add(event.image);
+		}
+		 return myEventImageList.toArray(new String[myEventImageList.size()]);
+	}
+	
+	
+	 
 	public void addMyEvent(EventInfo event)
 	{
 		myEventList.add(event);

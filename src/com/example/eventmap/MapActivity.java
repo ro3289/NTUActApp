@@ -80,7 +80,8 @@ public class MapActivity extends Activity implements OnInfoWindowClickListener{
 				int    ID 	    = jsonArray.getJSONObject(index).getInt("ID");
 				String name 	= jsonArray.getJSONObject(index).getString("Name");
 				String location = jsonArray.getJSONObject(index).getString("Location");
-				String url 		= jsonArray.getJSONObject(index).getString("url");
+				String url 		= jsonArray.getJSONObject(index).getString("Url");
+				String image	= jsonArray.getJSONObject(index).getString("ImageUrl");
 				String content 	= jsonArray.getJSONObject(index).getString("Content");
 				String date 	= jsonArray.getJSONObject(index).getString("Time");
 				double lat 		= jsonArray.getJSONObject(index).getDouble("Latitude");
@@ -88,7 +89,7 @@ public class MapActivity extends Activity implements OnInfoWindowClickListener{
 				int    tag		= jsonArray.getJSONObject(index).getInt("Tag");
 				// Construct events
 				try {
-					createEvent(ID, name, location, url, content, new LatLng(lat, lng), sdf.parse(date), tag);
+					createEvent(ID, name, location, url, image, content, new LatLng(lat, lng), sdf.parse(date), tag);
 				} catch (ParseException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -107,9 +108,9 @@ public class MapActivity extends Activity implements OnInfoWindowClickListener{
 		}
 	}
 	
-	private void createEvent(int ID, String Name, String Location, String url, String Content, LatLng position, Date date, int tag) 
+	private void createEvent(int ID, String Name, String Location, String url, String image, String Content, LatLng position, Date date, int tag) 
 	{
-		EventInfo event = new EventInfo(ID, Name, Location, url, Content, date, tag);
+		EventInfo event = new EventInfo(ID, Name, Location, url, image, Content, date, tag);
 		Marker marker = map.addMarker(new MarkerOptions().position(position).title(Name));
 		eventHashMap.put(marker, event);
 		map.moveCamera(CameraUpdateFactory.newLatLngZoom(position, 15));

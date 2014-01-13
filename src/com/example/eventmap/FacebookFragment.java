@@ -32,18 +32,18 @@ public class FacebookFragment extends ListFragment {
 
 	private ImageLoader imageLoader = ImageLoader.getInstance();
 	private DisplayImageOptions options;
-	private MyListAdapter myListAdapter;
+	private ListItemAdapter myListAdapter;
 	// Load events and images from Account
 	private String[] myEventName;
 	private String[] myEventContent;
     private String[] myEventImage;
 	
-	public class MyListAdapter extends ArrayAdapter<String> {
+	public class ListItemAdapter extends ArrayAdapter<String> {
 		
 	  private ImageLoadingListener animateFirstListener = new AnimateFirstDisplayListener();
 	  Context myContext;
 	
-	  public MyListAdapter(Context context, int textViewResourceId, String[] objects) {
+	  public ListItemAdapter(Context context, int textViewResourceId, String[] objects) {
 		  super(context, textViewResourceId, objects);
 		  myContext = context;
 	  }
@@ -101,7 +101,7 @@ public class FacebookFragment extends ListFragment {
     	.defaultDisplayImageOptions(options)
     	.build();
 		imageLoader.init(config);
-		myListAdapter = new MyListAdapter(getActivity(), R.layout.listview_myevent, myEventName);
+		myListAdapter = new ListItemAdapter(getActivity(), R.layout.listview_myevent, myEventName);
 		setListAdapter(myListAdapter);
 	}
 	
@@ -135,7 +135,7 @@ public class FacebookFragment extends ListFragment {
 		myEventName		= Account.getInstance().getEventNameStringArray();
 		myEventContent 	= Account.getInstance().getEventContentStringArray();
 		myEventImage 	= Account.getInstance().getEventImageStringArray();
-		myListAdapter = new MyListAdapter(getActivity(), R.layout.listview_myevent, myEventName);
+		myListAdapter = new ListItemAdapter(getActivity(), R.layout.listview_myevent, myEventName);
 		setListAdapter(myListAdapter);
 	}
 	

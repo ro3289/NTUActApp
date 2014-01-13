@@ -322,8 +322,8 @@ public class MapActivity extends Activity implements OnInfoWindowClickListener{
 	
 	@Override
 	public void onBackPressed() {
-	    Intent myIntent=new Intent(MapActivity.this, MainActivity.class);
-        startActivity(myIntent);
+	    Intent myIntent = new Intent(MapActivity.this, MainActivity.class);
+	    setResult(0,myIntent);
         finish();
 	}
 }

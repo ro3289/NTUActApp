@@ -9,18 +9,24 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.app.AlertDialog;
 import android.app.ActionBar.LayoutParams;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTabHost;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.util.Account;
 import com.example.util.DBConnector;
@@ -72,15 +78,14 @@ public class MainActivity extends FragmentActivity {
         .build());
 
         EventDialog.setUpEventDialog(this);
-        this.getEventInfo();
-        this.getUserInfo();
+        this.showLoginDialog();
+        
 
         Button mapActivity = (Button)findViewById(R.id.map_activity);
         mapActivity.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
                 Intent myIntent=new Intent(v.getContext(), MapActivity.class);
-                startActivity(myIntent);
-                finish();
+                startActivityForResult(myIntent,0);
             }
         });
         
@@ -96,10 +101,13 @@ public class MainActivity extends FragmentActivity {
     }
    
     
-    private void getUserInfo() {
+    private boolean getUserInfo(String name, String pwd) {
     	// User information and preference
     	try {
-			String accountData = new DBConnector().execute("SELECT * FROM userlist WHERE ID = 0" ).get();
+			String accountData = new DBConnector()
+			.execute("SELECT * FROM userlist WHERE Username =" + "'" + name + "'"
+					+ "AND Password =" + "'" + pwd + "'")
+			.get();
 			JSONArray jsonArray = new JSONArray(accountData);
 			if(jsonArray.length() != 0)
 			{
@@ -108,6 +116,7 @@ public class MainActivity extends FragmentActivity {
 				String password   = jsonArray.getJSONObject(0).getString("Password");
 				int    preference = jsonArray.getJSONObject(0).getInt("Preference");
 				Account.updateAccount(this, id, username, password, preference);
+				return true;
 			}
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
@@ -119,25 +128,7 @@ public class MainActivity extends FragmentActivity {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-    	// Tracing events
-    	try {
-			String myEventData = new DBConnector().execute("SELECT * FROM user_act WHERE UserID = 0").get();
-			JSONArray jsonArray = new JSONArray(myEventData);
-			for(int index = 0; index < jsonArray.length(); ++index)
-			{
-				int eventID = jsonArray.getJSONObject(index).getInt("ActID");
-				Account.getInstance().addMyEvent(eventList.get(eventID));
-			}
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+    	return false;
 	}
 
     private void getEventInfo()
@@ -175,45 +166,77 @@ public class MainActivity extends FragmentActivity {
 			e.printStackTrace();
 		}
     }
-  /*  
-    private void getActivitiesRecords() {
-
-        TableLayout user_list = (TableLayout)findViewById(R.id.user_list);
-        user_list.setStretchAllColumns(true);
-        TableLayout.LayoutParams row_layout = new TableLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-        TableRow.LayoutParams view_layout = new TableRow.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-        try {
-            String result = new DBConnector().execute("SELECT * FROM activity").get();
-            System.out.println(result);
-            /*
-                SQL 結果有多筆資料時使用JSONArray
-                                                        只有一筆資料時直接建立JSONObject物件
-                JSONObject jsonData = new JSONObject(result);
-            */
-    /*
-            JSONArray jsonArray = new JSONArray(result);
-            for(int i = 0; i < jsonArray.length(); i++) {
-                JSONObject jsonData = jsonArray.getJSONObject(i);
-                TableRow tr = new TableRow(MainActivity.this);
-                tr.setLayoutParams(row_layout);
-                tr.setGravity(Gravity.CENTER_HORIZONTAL);
-                
-                TextView user_acc = new TextView(MainActivity.this);
-                user_acc.setText(jsonData.getString("Name"));
-                user_acc.setLayoutParams(view_layout);
-                
-                TextView user_pwd = new TextView(MainActivity.this);
-                user_pwd.setText(jsonData.getString("Time"));
-                user_pwd.setLayoutParams(view_layout);
-                
-                tr.addView(user_acc);
-                tr.addView(user_pwd);
-                user_list.addView(tr);
+    
+    private void getUserEvent(){
+    	// Tracing events
+    	try {
+			String myEventData = new DBConnector().execute("SELECT * FROM user_act WHERE UserID =" + Account.getInstance().getUserID()).get();
+			JSONArray jsonArray = new JSONArray(myEventData);
+			Account.getInstance().clearEvent();
+			for(int index = 0; index < jsonArray.length(); ++index)
+			{
+				int eventID = jsonArray.getJSONObject(index).getInt("ActID");
+				Account.getInstance().addMyEvent(eventList.get(eventID));
+			}
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    }
+    
+    private void showLoginDialog(){
+    	LayoutInflater layoutInflater = this.getLayoutInflater();
+		final View inflater = layoutInflater.inflate(R.layout.dialog_login, null) ;
+		((TextView) inflater.findViewById(R.id.username_text)).setText("使用者名稱");
+		((TextView) inflater.findViewById(R.id.password_text)).setText("使用者密碼");
+    	AlertDialog loginDialog = new AlertDialog.Builder(this)
+    	.setTitle("NTUAct")
+    	.setView(inflater)
+        .setPositiveButton(R.string.log_in, new DialogInterface.OnClickListener() {
+        	@Override
+            public void onClick(DialogInterface dialog, int whichButton) {
+				String username = ((EditText) inflater.findViewById(R.id.username_edit)).getText().toString();
+				String password = ((EditText) inflater.findViewById(R.id.password_edit)).getText().toString();
+        		if(getUserInfo(username, password)){
+        			getEventInfo();
+        			getUserEvent();
+        		}else{
+            		Toast.makeText(getApplicationContext(), "請重新輸入", Toast.LENGTH_SHORT).show();
+            		showLoginDialog();
+        		}
             }
-        } catch(Exception e) {
-            // Log.e("log_tag", e.toString());
-        }
-    }*/
+        })
+        .setNeutralButton(R.string.sign_up, new DialogInterface.OnClickListener(){
+			@Override
+			public void onClick(DialogInterface dialog, int whichButton) {
+				String username = ((EditText) inflater.findViewById(R.id.username_edit)).getText().toString();
+				String password = ((EditText) inflater.findViewById(R.id.password_edit)).getText().toString();
+				if(!checkAccountExsistence(username)){
+					registerAccount(username, password);
+					getEventInfo();
+					getUserInfo(username, password);
+				}else{
+					Toast.makeText(getApplicationContext(), "名稱已經有人使用", Toast.LENGTH_SHORT).show();
+					showLoginDialog();
+				}
+			}
+        })
+        .setNegativeButton(R.string.exit, new DialogInterface.OnClickListener() {
+        	@Override
+            public void onClick(DialogInterface dialog, int whichButton) {
+            	System.exit(0);
+            }
+        })
+        .create();
+		loginDialog.setCanceledOnTouchOutside(false);
+		loginDialog.show();
+    }
     
 	public String getAppleData(){
 		return "Apple 123";
@@ -229,5 +252,39 @@ public class MainActivity extends FragmentActivity {
 	
 	public String getTwitterData(){
 		return "Twitter abc";
+	}
+	
+	public boolean checkAccountExsistence(String name){
+		try {
+			String result = new DBConnector().execute("SELECT Username FROM userlist WHERE Username = " + "'" + name + "'").get();
+			JSONArray jsonArray = new JSONArray(result);
+			return ((jsonArray.length() == 0)? false : true);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return false;
+	}
+	
+	public void registerAccount(String name, String pwd){
+		new DBConnector().execute("INSERT INTO userlist (Username, Password) VALUES (" + "'" + name + "'," + "'" + pwd + "')");
+	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+	    // Check which request we're responding to
+	    if (requestCode == 0) {
+	        // Make sure the request was successful
+	    	EventDialog.setUpEventDialog(this);
+	        getUserEvent();
+	        FacebookFragment eventFragment = (FacebookFragment)getSupportFragmentManager().findFragmentByTag("Facebook");
+	        if(eventFragment != null) eventFragment.updateEventList();
+	    }
 	}
 }

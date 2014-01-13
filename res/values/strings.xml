@@ -12,5 +12,7 @@
     <string name="cancel">Cancel</string>
     <string name="visit">前往專頁</string>
     <string name="exit">離開</string>
+    <string name="log_in">登入</string>
+    <string name="sign_up">註冊</string>
 
 </resources>

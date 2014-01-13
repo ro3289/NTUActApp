@@ -43,7 +43,7 @@ public class EventDialog {
 	public void showEventInfoDialog(final EventInfo event, final FacebookFragment eventListFragment) {
 		
 		LayoutInflater layoutInflater = activity.getLayoutInflater();
-		final View inflater = layoutInflater.inflate(R.layout.event_dialog, null) ;
+		final View inflater = layoutInflater.inflate(R.layout.dialog_event, null) ;
 		((TextView) inflater.findViewById(R.id.event_name)).setText("活動名稱： " + event.name);
 		((TextView) inflater.findViewById(R.id.event_content)).setText("活動敘述： " + event.content);
 		ImageView image = (ImageView) inflater.findViewById(R.id.dialog_image);
@@ -84,6 +84,7 @@ public class EventDialog {
 				}
 			}
 		});
+		AlertDialog eventDialog = 
     	new AlertDialog.Builder(activity)
         .setView(inflater)
         .setPositiveButton(R.string.visit,
@@ -107,8 +108,9 @@ public class EventDialog {
                 	}
                 }
             }
-        )
-        .show();
+        ).create();
+		eventDialog.setCanceledOnTouchOutside(false);
+		eventDialog.show();
     }
 	
 	public static EventDialog getInstance(){

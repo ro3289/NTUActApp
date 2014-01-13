@@ -283,9 +283,8 @@ public class MainActivity extends FragmentActivity {
 	        // Make sure the request was successful
 	    	EventDialog.setUpEventDialog(this);
 	        getUserEvent();
-	        // BUG HERE!!!!!
 	        FacebookFragment eventFragment = (FacebookFragment)getSupportFragmentManager().findFragmentByTag("Facebook");
-	        eventFragment.updateEventList();
+	        if(eventFragment != null) eventFragment.updateEventList();
 	    }
 	}
 }

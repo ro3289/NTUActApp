@@ -186,8 +186,13 @@ public class Account{
 		}
 		return false;
 	}
+
+	public void clearEvent(){
+		myEventList.clear();
+	}
 	
 	public int getUserID(){
 		return userID;
 	}
+
 }

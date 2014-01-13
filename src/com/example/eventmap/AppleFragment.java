@@ -16,8 +16,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
@@ -28,7 +26,6 @@ import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.ImageLoadingListener;
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
 import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
-
 import com.example.pageviewitem.ViewPagerItem;;
 
 public class AppleFragment extends Fragment {
@@ -36,15 +33,10 @@ public class AppleFragment extends Fragment {
 	ImageLoader imageLoader = ImageLoader.getInstance();
 	DisplayImageOptions options;
 	GridView gridview1;
-	GridView gridview2;
 	@Override
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
 		Log.d("=====>", "AppleFragment onAttach");
-		//myActivity=activity;
-		//MainActivity mainActivity = (MainActivity)activity;
-		//value = mainActivity.getAppleData();
-		
 	}
 
 	@Override
@@ -62,12 +54,9 @@ public class AppleFragment extends Fragment {
 			.cacheInMemory()
 			.cacheOnDisc()
 			.build();
-     // gridview configuration
+     // GridView configuration
         gridview1 = (GridView) rootView.findViewById(R.id.gridView1);
         gridview1.setColumnWidth(GridView.AUTO_FIT);
-        //gridview2 = (GridView) rootView.findViewById(R.id.gridView1);
-     	
-        
 		return rootView;
 	}
 
@@ -76,24 +65,13 @@ public class AppleFragment extends Fragment {
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		Log.d("=====>", "AppleFragment onActivityCreated");
-		//imageView=((MainActivity) myActivity).setImage();
-		//TextView txtResult = (TextView) this.getView().findViewById(R.id.textView1);
-		//txtResult.setText(value);
-		
 		ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(getActivity().getApplicationContext())
     	.defaultDisplayImageOptions(options)
     	.build();
 		imageLoader.init(config);
 		gridview1.setAdapter(new ItemAdapter(getActivity()));
-     	gridview1.setOnItemClickListener(new OnItemClickListener(){
-	     	@Override
-	     	public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-	     		// TODO
-	     	}
-     	});
 	}
-	// gridview Adapter
+	// GridView Adapter
 	class ItemAdapter extends BaseAdapter {
 
 		private ImageLoadingListener animateFirstListener = new AnimateFirstDisplayListener();
@@ -102,13 +80,13 @@ public class AppleFragment extends Fragment {
 	        mContext=ctx;
 	    }
 		private class ViewHolder {
-			public ImageView image;
+			public ImageView image1;
 			public ImageView image2;
 		}
 
 		@Override
 		public int getCount() {
-			return (IMAGES2.length+1)/2;
+			return (imageSource.length+1)/2;
 		}
 
 		@Override
@@ -139,18 +117,16 @@ public class AppleFragment extends Fragment {
 
 		@Override
 		public View getView(final int position, View convertView, ViewGroup parent) {
-			System.out.println(position);
 			View view = convertView;
 			final ViewHolder holder;
 			
 			if (convertView == null) {
-				//if(position==0)
 				holder = new ViewHolder();
 				if(getItemViewType(position)==0)
 				{
 					view =  LayoutInflater.from(mContext).inflate(R.layout.list_item, parent, false);
-					holder.image = (ImageView) view.findViewById(R.id.image);	
-					holder.image.setOnClickListener(new OnClickListener(){
+					holder.image1 = (ImageView) view.findViewById(R.id.image);	
+					holder.image1.setOnClickListener(new OnClickListener(){
 						@Override
 					    public void onClick(View v) {
 							FragmentManager fm = getFragmentManager();
@@ -160,42 +136,23 @@ public class AppleFragment extends Fragment {
 				     		ft.commit();
 					    }
 					});
-				}
-				else
-				{
+				}else {
 					view =  LayoutInflater.from(mContext).inflate(R.layout.list_item2, parent, false);
-					holder.image = (ImageView) view.findViewById(R.id.image2);
+					holder.image1 = (ImageView) view.findViewById(R.id.image2);
 					holder.image2 = (ImageView) view.findViewById(R.id.image3);
 				}
 				
-				/*else
-				view =  LayoutInflater.from(mContext).inflate(R.layout.list_item2, parent, false);*/
-					
-				
-				//holder.text = (TextView) view.findViewById(R.id.text);
-				//if(position==0)
-					
-				/*else
-				{System.out.println(position+":)");
-				
-				}*/
 				view.setTag(holder);
-			} else {
+			}else {
 				holder = (ViewHolder) view.getTag();
 			}
 
-			//holder.text.setText("這是第 "+ (position+1) +" 項");
-			/*if(number==1)
-				imageLoader.displayImage(IMAGES1[position], holder.image, options, animateFirstListener);
-			else*/
 			if(getItemViewType(position)==0)
 			{
-			imageLoader.displayImage(IMAGES2[position], holder.image, options, animateFirstListener);
-			}
-			else
-			{System.out.println(position+":)");
-				imageLoader.displayImage(IMAGES2[(position-1)*2+1], holder.image, options, animateFirstListener);
-				imageLoader.displayImage(IMAGES2[(position-1)*2+2], holder.image2, options, animateFirstListener);
+				imageLoader.displayImage(imageSource[position], holder.image1, options, animateFirstListener);
+			}else {System.out.println(position+":)");
+				imageLoader.displayImage(imageSource[(position-1)*2+1], holder.image1, options, animateFirstListener);
+				imageLoader.displayImage(imageSource[(position-1)*2+2], holder.image2, options, animateFirstListener);
 			}
 
 			return view;
@@ -222,7 +179,7 @@ public class AppleFragment extends Fragment {
 		}
 	}
     
-    public static final String[] IMAGES2 = new String[] {
+    public String[] imageSource = new String[] {
 		// 大圖片們
 		"http://140.112.18.223/activity2.jpg",
 		"http://140.112.18.223/activity3.jpg",
@@ -232,6 +189,10 @@ public class AppleFragment extends Fragment {
 		"http://140.112.18.223/activity6.jpg",
 		"http://140.112.18.223/activity6.jpg",
 		// 小圖片們
-		
 	};
+    
+    public void getHotEvent(){
+
+    }
+    
 }

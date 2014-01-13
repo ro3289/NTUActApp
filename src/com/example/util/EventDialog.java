@@ -77,10 +77,12 @@ public class EventDialog {
 					trackEventButton.setText("°lÂÜ¤¤");
 					Account.getInstance().addMyEvent(event);
 					new DBConnector().execute("INSERT INTO user_act (UserID, ActID) VALUES (" + Account.getInstance().getUserID() + ", " + event.id + ")");
+					new DBConnector().execute("UPDATE activity SET Follower = Follower + 1 WHERE ID = " + event.id + ")");
 				}else{
 					trackEventButton.setText("°lÂÜ¬¡°Ê");
 					Account.getInstance().deleteMyEvent(event);
 					new DBConnector().execute("DELETE FROM user_act WHERE UserID = " + Account.getInstance().getUserID() + " AND ActID = " + event.id);
+					new DBConnector().execute("UPDATE activity SET Follower = Follower - 1 WHERE ID = " + event.id + ")");
 				}
 			}
 		});

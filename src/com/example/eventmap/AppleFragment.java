@@ -9,10 +9,13 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
@@ -25,6 +28,8 @@ import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.ImageLoadingListener;
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
 import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
+
+import com.example.pageviewitem.ViewPagerItem;;
 
 public class AppleFragment extends Fragment {
 
@@ -145,6 +150,16 @@ public class AppleFragment extends Fragment {
 				{
 					view =  LayoutInflater.from(mContext).inflate(R.layout.list_item, parent, false);
 					holder.image = (ImageView) view.findViewById(R.id.image);	
+					holder.image.setOnClickListener(new OnClickListener(){
+						@Override
+					    public void onClick(View v) {
+							FragmentManager fm = getFragmentManager();
+				     		FragmentTransaction ft = fm.beginTransaction();
+				     		ViewPagerItem llf = new ViewPagerItem();
+				     		ft.replace(R.id.realtabcontent, llf);
+				     		ft.commit();
+					    }
+					});
 				}
 				else
 				{

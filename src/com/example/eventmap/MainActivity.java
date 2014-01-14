@@ -2,8 +2,8 @@ package com.example.eventmap;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import org.json.JSONArray;
@@ -16,6 +16,7 @@ import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTabHost;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -27,6 +28,16 @@ import com.example.util.Account;
 import com.example.util.DBConnector;
 import com.example.util.EventDialog;
 import com.example.util.EventInfo;
+import com.facebook.AppEventsLogger;
+import com.facebook.FacebookAuthorizationException;
+import com.facebook.FacebookOperationCanceledException;
+import com.facebook.Session;
+import com.facebook.SessionState;
+import com.facebook.UiLifecycleHelper;
+import com.facebook.model.GraphPlace;
+import com.facebook.model.GraphUser;
+import com.facebook.widget.FacebookDialog;
+import com.facebook.widget.LoginButton;
 
 public class MainActivity extends FragmentActivity {
 
@@ -74,8 +85,6 @@ public class MainActivity extends FragmentActivity {
 
         EventDialog.setUpEventDialog(this);
 //        this.showLoginDialog();
-        Intent myIntent=new Intent(MainActivity.this, FacebookLoginActivity.class);
-        startActivityForResult(myIntent,0);
 
         Button mapActivity = (Button)findViewById(R.id.map_activity);
         mapActivity.setOnClickListener(new Button.OnClickListener() {
@@ -94,6 +103,18 @@ public class MainActivity extends FragmentActivity {
 				//Account.getInstance().showMyEvent();
 			}
 		});
+        
+        // Facebook Login setting
+        uiHelper = new UiLifecycleHelper(this, callback);
+        uiHelper.onCreate(savedInstanceState);
+
+        if (savedInstanceState != null) {
+            String name = savedInstanceState.getString(PENDING_ACTION_BUNDLE_KEY);
+            pendingAction = PendingAction.valueOf(name);
+        }
+        
+        showFacebookLoginDialog();
+        
     }
    
     
@@ -289,5 +310,143 @@ public class MainActivity extends FragmentActivity {
 	    	AppleFragment eventFragment = (AppleFragment)getSupportFragmentManager().findFragmentByTag("Apple");
 	        if(eventFragment != null) eventFragment.updateHotEvent();
 	    }
+	    uiHelper.onActivityResult(requestCode, resultCode, data, dialogCallback);
 	}
+	
+	/* 
+	 * 
+	 * 
+	 * Facebook activity
+	 * 
+	 * 
+	 */
+    private final String PENDING_ACTION_BUNDLE_KEY = "com.facebook.samples.hellofacebook:PendingAction";
+
+    private LoginButton loginButton;
+    private PendingAction pendingAction = PendingAction.NONE;
+    private GraphUser user;
+    private GraphPlace place;
+    private List<GraphUser> tags;
+
+    private enum PendingAction {
+        NONE,
+        POST_PHOTO,
+        POST_STATUS_UPDATE
+    }
+    private UiLifecycleHelper uiHelper;
+
+    private Session.StatusCallback callback = new Session.StatusCallback() {
+        @Override
+        public void call(Session session, SessionState state, Exception exception) {
+            onSessionStateChange(session, state, exception);
+        }
+    };
+
+    private FacebookDialog.Callback dialogCallback = new FacebookDialog.Callback() {
+        @Override
+        public void onError(FacebookDialog.PendingCall pendingCall, Exception error, Bundle data) {
+            Log.d("HelloFacebook", String.format("Error: %s", error.toString()));
+        }
+
+        @Override
+        public void onComplete(FacebookDialog.PendingCall pendingCall, Bundle data) {
+            Log.d("HelloFacebook", "Success!");
+        }
+    };
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        uiHelper.onResume();
+
+        // Call the 'activateApp' method to log an app event for use in analytics and advertising reporting.  Do so in
+        // the onResume methods of the primary Activities that an app may be launched into.
+        AppEventsLogger.activateApp(this);
+
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        uiHelper.onSaveInstanceState(outState);
+
+        outState.putString(PENDING_ACTION_BUNDLE_KEY, pendingAction.name());
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        uiHelper.onPause();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        uiHelper.onDestroy();
+    }
+
+    private void onSessionStateChange(Session session, SessionState state, Exception exception) {
+        if (pendingAction != PendingAction.NONE &&
+                (exception instanceof FacebookOperationCanceledException ||
+                exception instanceof FacebookAuthorizationException)) {
+                new AlertDialog.Builder(MainActivity.this)
+                    .setTitle(R.string.cancel)
+                    .setPositiveButton(R.string.ok, null)
+                    .show();
+            pendingAction = PendingAction.NONE;
+        } else if (state == SessionState.OPENED_TOKEN_UPDATED) {
+            handlePendingAction();
+        }
+    }
+
+
+    @SuppressWarnings("incomplete-switch")
+    private void handlePendingAction() {
+        PendingAction previouslyPendingAction = pendingAction;
+        // These actions may re-set pendingAction if they are still pending, but we assume they
+        // will succeed.
+        pendingAction = PendingAction.NONE;
+
+        switch (previouslyPendingAction) {
+            case POST_PHOTO:
+                break;
+            case POST_STATUS_UPDATE:
+                break;
+        }
+    }
+    
+    
+    private void showFacebookLoginDialog(){
+    	LayoutInflater layoutInflater = this.getLayoutInflater();
+		final View inflater = layoutInflater.inflate(R.layout.facebook_layout, null) ;
+		loginButton = (LoginButton) inflater.findViewById(R.id.login_button);
+	    loginButton.setUserInfoChangedCallback(new LoginButton.UserInfoChangedCallback() {
+            @Override
+            public void onUserInfoFetched(GraphUser user) {
+                MainActivity.this.user = user;
+                // It's possible that we were waiting for this.user to be populated in order to post a
+                // status update.
+                handlePendingAction();
+            }
+	    });
+    	AlertDialog loginDialog = new AlertDialog.Builder(this)
+    	.setTitle("NTUAct")
+    	.setView(inflater)
+        .setPositiveButton(R.string.log_in, new DialogInterface.OnClickListener() {
+        	@Override
+            public void onClick(DialogInterface dialog, int whichButton) {
+				
+            }
+        })
+       
+        .setNegativeButton(R.string.exit, new DialogInterface.OnClickListener() {
+        	@Override
+            public void onClick(DialogInterface dialog, int whichButton) {
+            	System.exit(0);
+            }
+        })
+        .create();
+		loginDialog.setCanceledOnTouchOutside(false);
+		loginDialog.show();
+    }
 }

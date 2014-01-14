@@ -111,6 +111,7 @@ public class AppleFragment extends Fragment {
 			return 2;
 			
 		}
+		
 		public int getItemViewType(int position) {  
 		    int type = super.getItemViewType(position);  
 		    try {  

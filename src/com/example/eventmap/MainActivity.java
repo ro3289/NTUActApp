@@ -427,6 +427,9 @@ public class MainActivity extends FragmentActivity {
                 // It's possible that we were waiting for this.user to be populated in order to post a
                 // status update.
                 handlePendingAction();
+                if(MainActivity.this.user != null){
+                	
+                }
             }
 	    });
     	AlertDialog loginDialog = new AlertDialog.Builder(this)
@@ -438,7 +441,6 @@ public class MainActivity extends FragmentActivity {
 				
             }
         })
-       
         .setNegativeButton(R.string.exit, new DialogInterface.OnClickListener() {
         	@Override
             public void onClick(DialogInterface dialog, int whichButton) {

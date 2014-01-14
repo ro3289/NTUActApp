@@ -1,8 +1,14 @@
 package com.example.eventmap;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+
+import org.json.JSONArray;
+import org.json.JSONException;
 
 import android.app.Activity;
 import android.content.Context;
@@ -14,29 +20,36 @@ import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 
+import com.example.pageviewitem.ViewPagerItem;
+import com.example.util.DBConnector;
+import com.example.util.EventInfo;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.ImageLoadingListener;
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
 import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
-import com.example.pageviewitem.ViewPagerItem;;
 
 public class AppleFragment extends Fragment {
 
-	ImageLoader imageLoader = ImageLoader.getInstance();
-	DisplayImageOptions options;
-	GridView gridview1;
+	private ImageLoader imageLoader = ImageLoader.getInstance();
+	private DisplayImageOptions options;
+	private GridView gridview1;
+	private static final int NUMBER_OF_EVENTS = 11;
+	private ArrayList<String> imageSourceList = new ArrayList<String>();
+	public String[] imageSource;
+	
 	@Override
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
 		Log.d("=====>", "AppleFragment onAttach");
+		updateHotEvent();
 	}
 
 	@Override
@@ -45,7 +58,6 @@ public class AppleFragment extends Fragment {
 		Log.d("=====>", "AppleFragment onCreateView");
 		View rootView = inflater.inflate(R.layout.frg_apple, container, false);
 		setRetainInstance(true);
-
 		// ImageLoader configuration
         options = new DisplayImageOptions.Builder()
         	.showStubImage(R.drawable.ic_stub)
@@ -54,13 +66,11 @@ public class AppleFragment extends Fragment {
 			.cacheInMemory()
 			.cacheOnDisc()
 			.build();
-     // GridView configuration
+        // GridView configuration
         gridview1 = (GridView) rootView.findViewById(R.id.gridView1);
         gridview1.setColumnWidth(GridView.AUTO_FIT);
 		return rootView;
 	}
-
-	
 	
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
@@ -150,7 +160,7 @@ public class AppleFragment extends Fragment {
 			if(getItemViewType(position)==0)
 			{
 				imageLoader.displayImage(imageSource[position], holder.image1, options, animateFirstListener);
-			}else {System.out.println(position+":)");
+			}else {
 				imageLoader.displayImage(imageSource[(position-1)*2+1], holder.image1, options, animateFirstListener);
 				imageLoader.displayImage(imageSource[(position-1)*2+2], holder.image2, options, animateFirstListener);
 			}
@@ -178,7 +188,7 @@ public class AppleFragment extends Fragment {
 			}
 		}
 	}
-    
+    /*
     public String[] imageSource = new String[] {
 		// 大圖片們
 		"http://140.112.18.223/activity2.jpg",
@@ -190,9 +200,31 @@ public class AppleFragment extends Fragment {
 		"http://140.112.18.223/activity6.jpg",
 		// 小圖片們
 	};
-    
-    public void getHotEvent(){
-
+    */
+    public void updateHotEvent(){
+    	try {
+			String result = new DBConnector().execute("SELECT * FROM activity ORDER BY Follower DESC").get();
+			JSONArray jsonArray = new JSONArray(result);
+			int upperbound = ((jsonArray.length() < NUMBER_OF_EVENTS)? jsonArray.length(): NUMBER_OF_EVENTS);
+			HashMap<Integer,EventInfo> eventList = MainActivity.getEventList();
+			for(int index = 0; index < upperbound; ++index){
+				int    ID 	 = jsonArray.getJSONObject(index).getInt("ID");
+				String name  = jsonArray.getJSONObject(index).getString("Name");
+				String image = jsonArray.getJSONObject(index).getString("ImageUrl");
+				imageSourceList.add(image);
+			}
+			imageSource = imageSourceList.toArray(new String[imageSourceList.size()]);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	
     }
     
 }

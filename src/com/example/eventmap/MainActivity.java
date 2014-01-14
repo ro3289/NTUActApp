@@ -40,24 +40,29 @@ public class MainActivity extends FragmentActivity {
 		FragmentTabHost tabHost = (FragmentTabHost)findViewById(android.R.id.tabhost);
 		tabHost.setup(this, getSupportFragmentManager(), R.id.realtabcontent);
 		//1
-		tabHost.addTab(tabHost.newTabSpec("Apple")
-			   				  .setIndicator("Apple"), 
+		tabHost.addTab(tabHost.newTabSpec("熱門活動")
+			   				  .setIndicator("熱門活動"), 
    					  AppleFragment.class, 
    					  null);
 	    //2
-		tabHost.addTab(tabHost.newTabSpec("Google")
-				   			  .setIndicator("Google"), 
+		tabHost.addTab(tabHost.newTabSpec("最新活動")
+				   			  .setIndicator("最新活動"), 
 					  GoogleFragment.class, 
 					  null);
 	    //3
-		tabHost.addTab(tabHost.newTabSpec("Facebook")
-				   			  .setIndicator("Facebook"), 
+		tabHost.addTab(tabHost.newTabSpec("我的活動")
+				   			  .setIndicator("我的活動"), 
 					  FacebookFragment.class, 
 				      null);
 	    //4
-		tabHost.addTab(tabHost.newTabSpec("Twitter")
-			   				  .setIndicator("Twitter"), 
+		tabHost.addTab(tabHost.newTabSpec("帳號管理")
+			   				  .setIndicator("帳號管理"), 
 					  TwitterFragment.class, 
+					  null);
+		//4
+		tabHost.addTab(tabHost.newTabSpec("常用連結")
+			   				  .setIndicator("常用連結"), 
+					  	ConnectFragment.class, 
 					  null);
         
         StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()  
@@ -282,10 +287,10 @@ public class MainActivity extends FragmentActivity {
 	        // Make sure the request was successful
 	    	EventDialog.setUpEventDialog(this);
 	        getUserEvent();
-	        FacebookFragment eventFragment = (FacebookFragment)getSupportFragmentManager().findFragmentByTag("Facebook");
+	        FacebookFragment eventFragment = (FacebookFragment)getSupportFragmentManager().findFragmentByTag("最新活動");
 	        if(eventFragment != null) eventFragment.updateEventList();
 	    }else if (requestCode == 1){
-	    	AppleFragment eventFragment = (AppleFragment)getSupportFragmentManager().findFragmentByTag("Apple");
+	    	AppleFragment eventFragment = (AppleFragment)getSupportFragmentManager().findFragmentByTag("熱門活動");
 	        if(eventFragment != null) eventFragment.updateHotEvent();
 	    }
 	}

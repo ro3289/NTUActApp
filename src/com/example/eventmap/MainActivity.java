@@ -73,8 +73,9 @@ public class MainActivity extends FragmentActivity {
         .build());
 
         EventDialog.setUpEventDialog(this);
-        this.showLoginDialog();
-        
+//        this.showLoginDialog();
+        Intent myIntent=new Intent(MainActivity.this, FacebookLoginActivity.class);
+        startActivityForResult(myIntent,0);
 
         Button mapActivity = (Button)findViewById(R.id.map_activity);
         mapActivity.setOnClickListener(new Button.OnClickListener() {

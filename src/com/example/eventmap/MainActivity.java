@@ -3,6 +3,7 @@ package com.example.eventmap;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
 
 import org.json.JSONArray;
@@ -29,7 +30,7 @@ import com.example.util.EventInfo;
 
 public class MainActivity extends FragmentActivity {
 
-	public ArrayList<EventInfo> eventList = new ArrayList<EventInfo>();
+	public static HashMap<Integer,EventInfo> eventList = new HashMap<Integer, EventInfo>();
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -142,7 +143,7 @@ public class MainActivity extends FragmentActivity {
 				String date 	= jsonArray.getJSONObject(index).getString("Time");
 				int    tag 	    = jsonArray.getJSONObject(index).getInt("Tag");
 				try {
-					eventList.add(ID, new EventInfo(ID, name, location, url, image, content, sdf.parse(date), tag));
+					eventList.put(ID, new EventInfo(ID, name, location, url, image, content, sdf.parse(date), tag));
 				} catch (ParseException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -269,6 +270,10 @@ public class MainActivity extends FragmentActivity {
 	public void registerAccount(String name, String pwd){
 		new DBConnector().execute("INSERT INTO userlist (Username, Password) VALUES (" + "'" + name + "'," + "'" + pwd + "')");
 	}
+	
+	public static HashMap<Integer,EventInfo> getEventList(){
+		return eventList;
+	}
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -279,6 +284,9 @@ public class MainActivity extends FragmentActivity {
 	        getUserEvent();
 	        FacebookFragment eventFragment = (FacebookFragment)getSupportFragmentManager().findFragmentByTag("Facebook");
 	        if(eventFragment != null) eventFragment.updateEventList();
+	    }else if (requestCode == 1){
+	    	AppleFragment eventFragment = (AppleFragment)getSupportFragmentManager().findFragmentByTag("Apple");
+	        if(eventFragment != null) eventFragment.updateHotEvent();
 	    }
 	}
 }

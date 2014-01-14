@@ -1,8 +1,14 @@
 package com.example.eventmap;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+
+import org.json.JSONArray;
+import org.json.JSONException;
 
 import android.app.Activity;
 import android.content.Context;
@@ -15,14 +21,15 @@ import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.View.OnClickListener;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
+import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 
+import com.example.pageviewitem.ViewPagerItem;
+import com.example.util.DBConnector;
+import com.example.util.EventInfo;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
@@ -30,22 +37,21 @@ import com.nostra13.universalimageloader.core.assist.ImageLoadingListener;
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
 import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
 
-import com.example.pageviewitem.ViewPagerItem;;
-
 public class AppleFragment extends Fragment {
 
-	ImageLoader imageLoader = ImageLoader.getInstance();
-	DisplayImageOptions options;
-	GridView gridview1;
-	GridView gridview2;
+	private ImageLoader imageLoader = ImageLoader.getInstance();
+	private DisplayImageOptions options;
+	private GridView gridview1;
+	private static final int NUMBER_OF_EVENTS = 11;
+	private ArrayList<String> imageSourceList = new ArrayList<String>();
+	private String[] imageSource;
+	private int layerCount; 
+	
 	@Override
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
 		Log.d("=====>", "AppleFragment onAttach");
-		//myActivity=activity;
-		//MainActivity mainActivity = (MainActivity)activity;
-		//value = mainActivity.getAppleData();
-		
+		updateHotEvent();
 	}
 
 	@Override
@@ -54,7 +60,6 @@ public class AppleFragment extends Fragment {
 		Log.d("=====>", "AppleFragment onCreateView");
 		View rootView = inflater.inflate(R.layout.frg_apple, container, false);
 		setRetainInstance(true);
-
 		// ImageLoader configuration
         options = new DisplayImageOptions.Builder()
         	.showStubImage(R.drawable.ic_stub)
@@ -63,38 +68,22 @@ public class AppleFragment extends Fragment {
 			.cacheInMemory()
 			.cacheOnDisc()
 			.build();
-     // gridview configuration
+        // GridView configuration
         gridview1 = (GridView) rootView.findViewById(R.id.gridView1);
         gridview1.setColumnWidth(GridView.AUTO_FIT);
-        //gridview2 = (GridView) rootView.findViewById(R.id.gridView1);
-     	
-        
 		return rootView;
 	}
-
-	
 	
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		Log.d("=====>", "AppleFragment onActivityCreated");
-		//imageView=((MainActivity) myActivity).setImage();
-		//TextView txtResult = (TextView) this.getView().findViewById(R.id.textView1);
-		//txtResult.setText(value);
-		
 		ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(getActivity().getApplicationContext())
     	.defaultDisplayImageOptions(options)
     	.build();
 		imageLoader.init(config);
 		gridview1.setAdapter(new ItemAdapter(getActivity()));
-     	gridview1.setOnItemClickListener(new OnItemClickListener(){
-	     	@Override
-	     	public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-	     		// TODO
-	     	}
-     	});
 	}
-	// gridview Adapter
+	// GridView Adapter
 	class ItemAdapter extends BaseAdapter {
 
 		private ImageLoadingListener animateFirstListener = new AnimateFirstDisplayListener();
@@ -103,13 +92,13 @@ public class AppleFragment extends Fragment {
 	        mContext=ctx;
 	    }
 		private class ViewHolder {
-			public ImageView image;
+			public ImageView image1;
 			public ImageView image2;
 		}
 
 		@Override
 		public int getCount() {
-			return (IMAGES2.length+1)/2;
+			return layerCount;
 		}
 
 		@Override
@@ -125,11 +114,14 @@ public class AppleFragment extends Fragment {
 		public int getItemViewType(int position) {  
 		    int type = super.getItemViewType(position);  
 		    try {  
-		        type = (position>0)?1:0;
-		    } catch (Exception e) {  
+		    	if(((imageSource.length % 2 == 0) && (position + 1 == imageSource.length)) || (position == 0)){
+		    		type = 0;
+		    	}else{
+		    		type = 1;
+		    	}
+		    }catch(Exception e) {  
 		        e.printStackTrace();  
 		    }  
-		    System.out.println("getItemViewType::" + position + " is " + type);  
 		    return type;  
 		}
 
@@ -140,60 +132,39 @@ public class AppleFragment extends Fragment {
 
 		@Override
 		public View getView(final int position, View convertView, ViewGroup parent) {
-			System.out.println(position);
 			View view = convertView;
 			final ViewHolder holder;
 			
 			if (convertView == null) {
-				//if(position==0)
 				holder = new ViewHolder();
 				if(getItemViewType(position)==0)
 				{
 					view =  LayoutInflater.from(mContext).inflate(R.layout.list_item, parent, false);
-					holder.image = (ImageView) view.findViewById(R.id.image);	
-					holder.image.setOnClickListener(new OnClickListener(){
+					holder.image1 = (ImageView) view.findViewById(R.id.image);	
+					holder.image1.setOnClickListener(new OnClickListener(){
 						@Override
 					    public void onClick(View v) {
 							Intent myIntent=new Intent(v.getContext(), ViewPagerItem.class);
-			                startActivityForResult(myIntent,0);
+			                startActivityForResult(myIntent,1);
 					    }
 					});
-				}
-				else
-				{
+				}else {
 					view =  LayoutInflater.from(mContext).inflate(R.layout.list_item2, parent, false);
-					holder.image = (ImageView) view.findViewById(R.id.image2);
+					holder.image1 = (ImageView) view.findViewById(R.id.image2);
 					holder.image2 = (ImageView) view.findViewById(R.id.image3);
 				}
 				
-				/*else
-				view =  LayoutInflater.from(mContext).inflate(R.layout.list_item2, parent, false);*/
-					
-				
-				//holder.text = (TextView) view.findViewById(R.id.text);
-				//if(position==0)
-					
-				/*else
-				{System.out.println(position+":)");
-				
-				}*/
 				view.setTag(holder);
-			} else {
+			}else {
 				holder = (ViewHolder) view.getTag();
 			}
 
-			//holder.text.setText("這是第 "+ (position+1) +" 項");
-			/*if(number==1)
-				imageLoader.displayImage(IMAGES1[position], holder.image, options, animateFirstListener);
-			else*/
 			if(getItemViewType(position)==0)
 			{
-			imageLoader.displayImage(IMAGES2[position], holder.image, options, animateFirstListener);
-			}
-			else
-			{System.out.println(position+":)");
-				imageLoader.displayImage(IMAGES2[(position-1)*2+1], holder.image, options, animateFirstListener);
-				imageLoader.displayImage(IMAGES2[(position-1)*2+2], holder.image2, options, animateFirstListener);
+				imageLoader.displayImage(imageSource[position], holder.image1, options, animateFirstListener);
+			}else {
+				imageLoader.displayImage(imageSource[(position-1)*2+1], holder.image1, options, animateFirstListener);
+				imageLoader.displayImage(imageSource[(position-1)*2+2], holder.image2, options, animateFirstListener);
 			}
 
 			return view;
@@ -219,8 +190,8 @@ public class AppleFragment extends Fragment {
 			}
 		}
 	}
-    
-    public static final String[] IMAGES2 = new String[] {
+    /*
+    public String[] imageSource = new String[] {
 		// 大圖片們
 		"http://140.112.18.223/activity2.jpg",
 		"http://140.112.18.223/activity3.jpg",
@@ -230,6 +201,31 @@ public class AppleFragment extends Fragment {
 		"http://140.112.18.223/activity6.jpg",
 		"http://140.112.18.223/activity6.jpg",
 		// 小圖片們
-		
 	};
+    */
+    public void updateHotEvent(){
+    	try {
+			String result = new DBConnector().execute("SELECT ID, Name, ImageUrl FROM activity ORDER BY Follower DESC").get();
+			JSONArray jsonArray = new JSONArray(result);
+			int upperbound = ((jsonArray.length() < NUMBER_OF_EVENTS)? jsonArray.length(): NUMBER_OF_EVENTS);
+			for(int index = 0; index < upperbound; ++index){
+				int    ID 	 = jsonArray.getJSONObject(index).getInt("ID");
+				String name  = jsonArray.getJSONObject(index).getString("Name");
+				String image = jsonArray.getJSONObject(index).getString("ImageUrl");
+				imageSourceList.add(image);
+			}
+			imageSource = imageSourceList.toArray(new String[imageSourceList.size()]);
+			layerCount = ((imageSource.length % 2 == 0)? (imageSource.length+2)/2 : (imageSource.length+1)/2);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    }
+    
 }

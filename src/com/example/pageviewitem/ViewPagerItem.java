@@ -2,6 +2,7 @@ package com.example.pageviewitem;
 
 import java.util.ArrayList;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -13,11 +14,13 @@ import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import com.example.eventmap.R;
 
+import com.example.eventmap.MainActivity;
+import com.example.eventmap.MapActivity;
+import com.example.eventmap.R;
 import com.example.pageviewitem.ViewPagerAdapter;;
 
-public class ViewPagerItem extends FragmentActivity implements OnClickListener,OnPageChangeListener{
+public class ViewPagerItem extends FragmentActivity implements OnClickListener, OnPageChangeListener{
 	//定义ViewPager对象
 	private ViewPager viewPager;
 	
@@ -149,5 +152,11 @@ public class ViewPagerItem extends FragmentActivity implements OnClickListener,O
 
         currentIndex = positon;
     }
+   @Override
+	public void onBackPressed() {
+	    Intent myIntent = new Intent(ViewPagerItem.this, MainActivity.class);
+	    setResult(1,myIntent);
+	    finish();
+	}
 
 }

@@ -59,8 +59,8 @@ public class EventDialog {
 		ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(activity.getApplicationContext())
     	.defaultDisplayImageOptions(options)
     	.build();
+		
 		imageLoader.init(config);
-
 		imageLoader.displayImage(event.image, image, options, animateFirstListener);
 		
 		// Set track event button
@@ -122,23 +122,23 @@ public class EventDialog {
 	
 	// Image loader method
 	// 圖片顯示動畫
-			private static class AnimateFirstDisplayListener extends SimpleImageLoadingListener {
+	private static class AnimateFirstDisplayListener extends SimpleImageLoadingListener {
 
-				static final List<String> displayedImages = Collections.synchronizedList(new LinkedList<String>());
+		static final List<String> displayedImages = Collections.synchronizedList(new LinkedList<String>());
 
-				@Override
-				public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
-					if (loadedImage != null) {
-						ImageView imageView = (ImageView) view;
-						boolean firstDisplay = !displayedImages.contains(imageUri);
-						if (firstDisplay) {
-							FadeInBitmapDisplayer.animate(imageView, 500);
-						} else {
-							imageView.setImageBitmap(loadedImage);
-						}
-						displayedImages.add(imageUri);
-					}
+		@Override
+		public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
+			if (loadedImage != null) {
+				ImageView imageView = (ImageView) view;
+				boolean firstDisplay = !displayedImages.contains(imageUri);
+				if (firstDisplay) {
+					FadeInBitmapDisplayer.animate(imageView, 500);
+				} else {
+					imageView.setImageBitmap(loadedImage);
 				}
+				displayedImages.add(imageUri);
 			}
+		}
+	}
 	
 }

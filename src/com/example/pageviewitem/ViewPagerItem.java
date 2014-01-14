@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.view.LayoutInflater;
@@ -16,7 +17,7 @@ import com.example.eventmap.R;
 
 import com.example.pageviewitem.ViewPagerAdapter;;
 
-public class ViewPagerItem extends Fragment implements OnClickListener,OnPageChangeListener{
+public class ViewPagerItem extends FragmentActivity implements OnClickListener,OnPageChangeListener{
 	//定义ViewPager对象
 	private ViewPager viewPager;
 	
@@ -34,90 +35,55 @@ public class ViewPagerItem extends Fragment implements OnClickListener,OnPageCha
     
     //记录当前选中位置
     private int currentIndex;
-    /*public ViewPagerItem()
-    {
-    	setContentView(R.layout.layoutpager);
-    }*/
+    
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
-                                                                                                                                                                                                                                                                                                                      
-        View view = inflater.inflate(R.layout.layoutpaper, null);  
-        views = new ArrayList<View>();
+    public void onCreate(Bundle savedInstanceState) { 
+    	super.onCreate(savedInstanceState);
+		setContentView(R.layout.layoutpaper);
+		initView();
+		
+		initData();	
+    }
+    private void initView(){
+		//实例化ArrayList对象
+		views = new ArrayList<View>();
 		
 		//实例化ViewPager
-		viewPager = (ViewPager) view.findViewById(R.id.viewpager);
+		viewPager = (ViewPager) findViewById(R.id.viewpager);
 		
 		//实例化ViewPager适配器
 		vpAdapter = new ViewPagerAdapter(views);
-		System.out.println("hehehehhehehehhehe");
+	}
+	
+	/**
+	 * 初始化数据
+	 */
+	private void initData(){
+		//定义一个布局并设置参数
+		//LinearLayout.LayoutParams mParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT,
+          //      														  LinearLayout.LayoutParams.FILL_PARENT);
+       
         //初始化引导图片列表
         for(int i=0; i<pics.length; i++) {
-        	ImageView iv = new ImageView(getActivity());
+            ImageView iv = new ImageView(this);
             //iv.setLayoutParams(mParams);
             iv.setImageResource(pics[i]);
             views.add(iv);
         } 
-        System.out.println("hahahhahahahhahahaha1");
+        
         //设置数据
         viewPager.setAdapter(vpAdapter);
- 
-        //设置监听
-        viewPager.setOnPageChangeListener(this);
-
-        LinearLayout linearLayout = (LinearLayout) view.findViewById(R.id.ll);       
-        
-        points = new ImageView[pics.length];
-
-        //循环取得小点图片
-        for (int i = 0; i < pics.length; i++) {
-        	//得到一个LinearLayout下面的每一个子元素
-        	points[i] = (ImageView) linearLayout.getChildAt(i);
-        	//默认都设为灰色
-        	points[i].setEnabled(true);
-        	//给每个小点设置监听
-        	points[i].setOnClickListener(this);
-        	//设置位置tag，方便取出与当前位置对应
-        	points[i].setTag(i);
-        }
-        
-        //设置当面默认的位置
-        currentIndex = 0;
-        //设置为白色，即选中状态
-        points[currentIndex].setEnabled(false);
-        //System.out.println("hahahhahahahhahahaha");
-        //初始化底部小点
-        //initPoint();
-		//initData();	
-        return view;
-    }
-    
-    private void initData(){
-		//定义一个布局并设置参数
-		/*LinearLayout.LayoutParams mParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT,
-                														  LinearLayout.LayoutParams.FILL_PARENT);*/
-       //System.out.println("hehehehhehehehhehe");
-        //初始化引导图片列表
-        for(int i=0; i<pics.length; i++) {
-        	//System.out.println("hahahhahahahhahahaha1");
-            ImageView iv = (ImageView) getView().findViewById(pics[i]);
-            //iv.setLayoutParams(mParams);
-            
-            views.add(iv);
-        } 
-        System.out.println("hahahhahahahhahahaha2");
-        //设置数据
-        viewPager.setAdapter(vpAdapter);
-        //System.out.println("hahahhahahahhahahaha");
         //设置监听
         viewPager.setOnPageChangeListener(this);
         
         //初始化底部小点
         initPoint();
 	}
+   
+    
 
-    private void initPoint(){
-		LinearLayout linearLayout = (LinearLayout) getView().findViewById(R.id.ll);       
+	private void initPoint(){
+		LinearLayout linearLayout = (LinearLayout) findViewById(R.id.ll);       
 		
         points = new ImageView[pics.length];
 

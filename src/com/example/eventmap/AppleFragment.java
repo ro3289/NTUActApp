@@ -12,6 +12,7 @@ import org.json.JSONException;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -139,11 +140,8 @@ public class AppleFragment extends Fragment {
 					holder.image1.setOnClickListener(new OnClickListener(){
 						@Override
 					    public void onClick(View v) {
-							FragmentManager fm = getFragmentManager();
-				     		FragmentTransaction ft = fm.beginTransaction();
-				     		ViewPagerItem llf = new ViewPagerItem();
-				     		ft.replace(R.id.realtabcontent, llf);
-				     		ft.commit();
+							Intent myIntent=new Intent(v.getContext(), ViewPagerItem.class);
+			                startActivityForResult(myIntent,0);
 					    }
 					});
 				}else {

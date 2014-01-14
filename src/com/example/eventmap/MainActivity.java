@@ -284,6 +284,9 @@ public class MainActivity extends FragmentActivity {
 	        getUserEvent();
 	        FacebookFragment eventFragment = (FacebookFragment)getSupportFragmentManager().findFragmentByTag("Facebook");
 	        if(eventFragment != null) eventFragment.updateEventList();
+	    }else if (requestCode == 1){
+	    	AppleFragment eventFragment = (AppleFragment)getSupportFragmentManager().findFragmentByTag("Apple");
+	        if(eventFragment != null) eventFragment.updateHotEvent();
 	    }
 	}
 }

@@ -44,7 +44,8 @@ public class AppleFragment extends Fragment {
 	private GridView gridview1;
 	private static final int NUMBER_OF_EVENTS = 11;
 	private ArrayList<String> imageSourceList = new ArrayList<String>();
-	public String[] imageSource;
+	private String[] imageSource;
+	private int layerCount; 
 	
 	@Override
 	public void onAttach(Activity activity) {
@@ -97,7 +98,7 @@ public class AppleFragment extends Fragment {
 
 		@Override
 		public int getCount() {
-			return (imageSource.length+1)/2;
+			return layerCount;
 		}
 
 		@Override
@@ -113,11 +114,14 @@ public class AppleFragment extends Fragment {
 		public int getItemViewType(int position) {  
 		    int type = super.getItemViewType(position);  
 		    try {  
-		        type = (position>0)?1:0;
-		    } catch (Exception e) {  
+		    	if(((imageSource.length % 2 == 0) && (position + 1 == imageSource.length)) || (position == 0)){
+		    		type = 0;
+		    	}else{
+		    		type = 1;
+		    	}
+		    }catch(Exception e) {  
 		        e.printStackTrace();  
 		    }  
-		    System.out.println("getItemViewType::" + position + " is " + type);  
 		    return type;  
 		}
 
@@ -141,7 +145,7 @@ public class AppleFragment extends Fragment {
 						@Override
 					    public void onClick(View v) {
 							Intent myIntent=new Intent(v.getContext(), ViewPagerItem.class);
-			                startActivityForResult(myIntent,0);
+			                startActivityForResult(myIntent,1);
 					    }
 					});
 				}else {
@@ -201,10 +205,9 @@ public class AppleFragment extends Fragment {
     */
     public void updateHotEvent(){
     	try {
-			String result = new DBConnector().execute("SELECT * FROM activity ORDER BY Follower DESC").get();
+			String result = new DBConnector().execute("SELECT ID, Name, ImageUrl FROM activity ORDER BY Follower DESC").get();
 			JSONArray jsonArray = new JSONArray(result);
 			int upperbound = ((jsonArray.length() < NUMBER_OF_EVENTS)? jsonArray.length(): NUMBER_OF_EVENTS);
-			HashMap<Integer,EventInfo> eventList = MainActivity.getEventList();
 			for(int index = 0; index < upperbound; ++index){
 				int    ID 	 = jsonArray.getJSONObject(index).getInt("ID");
 				String name  = jsonArray.getJSONObject(index).getString("Name");
@@ -212,6 +215,7 @@ public class AppleFragment extends Fragment {
 				imageSourceList.add(image);
 			}
 			imageSource = imageSourceList.toArray(new String[imageSourceList.size()]);
+			layerCount = ((imageSource.length % 2 == 0)? (imageSource.length+2)/2 : (imageSource.length+1)/2);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -222,7 +226,6 @@ public class AppleFragment extends Fragment {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-    	
     }
     
 }

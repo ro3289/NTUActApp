@@ -26,9 +26,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.eventmap.FacebookFragment;
-import com.example.eventmap.FriendPickerApplication;
 import com.example.eventmap.R;
-import com.facebook.model.GraphUser;
 import com.facebook.widget.ProfilePictureView;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -205,7 +203,6 @@ public class EventDialog {
 	    // Specify the list array, the items to be selected by default (null for none),
 	    // and the listener through which to receive callbacks when items are selected
        .show();
-
 	}
 	
 	public class ListItemAdapter extends ArrayAdapter<String> {
@@ -232,14 +229,4 @@ public class EventDialog {
 		  }
 	}
 
-	private void getSelectedFriends(){
-		FriendPickerApplication application = (FriendPickerApplication) activity.getApplication();
-        List<GraphUser> selectedUsers = application.getSelectedUsers();
-        if (selectedUsers != null) {
-
-        }else {
-        	
-        }
-	}
-	
 }

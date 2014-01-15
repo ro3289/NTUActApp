@@ -22,6 +22,7 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTabHost;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -64,12 +65,8 @@ public class MainActivity extends FragmentActivity {
 	private AlertDialog facebookLoginDialog;
 	private static int MY_EVENT_FRAGMENT = 0;
 	private static int HOT_EVENT_FRAGMENT = 1;
-	private String[] myEventName;
-	private String[] myEventContent;
-	private String[] myEventImage;
-	protected EditText searchText;
-	private DisplayImageOptions options;
-	private ImageLoader imageLoader = ImageLoader.getInstance();
+	public boolean MY_PREFERENCE = true;
+	
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -135,8 +132,8 @@ public class MainActivity extends FragmentActivity {
         });
         
         // Test for dialog
-        Button infoDialog = (Button) findViewById(R.id.get_info);
-        infoDialog.setOnClickListener(new View.OnClickListener() {
+        Button setPreference = (Button) findViewById(R.id.set_preference);
+        setPreference.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				Account.getInstance().showMyPreference();
@@ -144,12 +141,27 @@ public class MainActivity extends FragmentActivity {
 			}
 		});
         
-       /* Button pickFriendButton = (Button) findViewById(R.id.pick_friend);
+        Button pickFriendButton = (Button) findViewById(R.id.pick_friend);
         pickFriendButton.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
             	startPickFriendsActivity();
             }
-        });*/
+        });
+        
+        final Button switchButton = (Button) findViewById(R.id.preference_friend_switch);
+        switchButton.setOnClickListener(new Button.OnClickListener() {
+            public void onClick(View v) {
+            	if(switchButton.getText().equals("朋友活動")){
+            		switchButton.setText("我的偏好");
+            		MY_PREFERENCE = false;
+            		updateMyFriendEvent();
+            	} else {
+            		switchButton.setText("朋友活動");
+            		MY_PREFERENCE = true;
+            		updatePreferenceEvent();
+            	}
+            }
+        });
         
         // Facebook Login setting
         uiHelper = new UiLifecycleHelper(this, callback);
@@ -255,6 +267,11 @@ public class MainActivity extends FragmentActivity {
         if(eventFragment != null) eventFragment.updatePreferenceEvent();
 	}
 	
+	private void updateMyFriendEvent(){
+		TwitterFragment eventFragment = (TwitterFragment) getSupportFragmentManager().findFragmentByTag("偏好瀏覽");
+        if(eventFragment != null) eventFragment.updateMyFriendEvent();
+	}
+	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 	    // Check which request we're responding to
@@ -267,7 +284,7 @@ public class MainActivity extends FragmentActivity {
 	    	AppleFragment eventFragment = (AppleFragment)getSupportFragmentManager().findFragmentByTag("熱門活動");
 	        if(eventFragment != null) eventFragment.updateHotEvent();
 	    }else if (requestCode == PICK_FRIENDS_ACTIVITY){
-	    	
+	    	updateMyFriendEvent();
 	    }
 	    uiHelper.onActivityResult(requestCode, resultCode, data, dialogCallback);
 	}
@@ -525,6 +542,19 @@ public class MainActivity extends FragmentActivity {
         //pendingRequest = false;
         Request.executeBatchAndWait(requests);
     }
+    
+    ///////////////////////////
+    /////////Search////////////
+    ///////////////////////////
+    
+    private String[] myEventName;
+	private String[] myEventContent;
+	private String[] myEventImage;
+	protected EditText searchText;
+	private DisplayImageOptions options;
+	private ImageLoader imageLoader = ImageLoader.getInstance();
+	
+	
     public void search(View view){
     	// Tracing events
     	System.out.println("hehehehheheeeeeeeeeee");

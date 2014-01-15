@@ -13,7 +13,7 @@ public class EventInfo {
 	public String 	image;
 	public String  	content;
 	private Calendar cal;
-	private int 	tagValue;
+	public int 	tagValue;
 	
 	public EventInfo(int ID, String Name, String Location, String u, String i, String Content, Date date, int tag)
 	{

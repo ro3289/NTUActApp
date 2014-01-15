@@ -16,8 +16,6 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,7 +27,6 @@ import android.widget.ImageView;
 
 import com.example.pageviewitem.ViewPagerItem;
 import com.example.util.DBConnector;
-import com.example.util.EventInfo;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
@@ -191,19 +188,7 @@ public class AppleFragment extends Fragment {
 			}
 		}
 	}
-    /*
-    public String[] imageSource = new String[] {
-		// 大圖片們
-		"http://140.112.18.223/activity2.jpg",
-		"http://140.112.18.223/activity3.jpg",
-		"http://140.112.18.223/activity1.jpg",
-		"http://140.112.18.223/activity4.jpg",
-		"http://140.112.18.223/activity5.gif",
-		"http://140.112.18.223/activity6.jpg",
-		"http://140.112.18.223/activity6.jpg",
-		// 小圖片們
-	};
-    */
+	
     public void updateHotEvent(){
     	try {
 			String result = new DBConnector().execute("SELECT ID, Name, ImageUrl FROM activity ORDER BY Follower DESC").get();

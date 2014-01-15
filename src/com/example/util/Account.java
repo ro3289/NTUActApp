@@ -195,6 +195,8 @@ public class Account{
 		return userID;
 	}
 	
-	
+	public int getMyPreference(){
+		return myPreference;
+	}
 
 }

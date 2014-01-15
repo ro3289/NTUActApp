@@ -28,27 +28,30 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"/>
-        
-	    <Button
-	        android:id="@+id/map_activity"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:layout_gravity="center_horizontal"
-	        android:layout_alignParentBottom="true"
-	        android:text="MAP" />
-	    
-	     <Button
-		    android:id="@+id/get_info"
-		    android:layout_height="wrap_content"
+        <LinearLayout  
+		    android:orientation="horizontal"
 		    android:layout_width="wrap_content"
-		    android:text="Info Dialog Test"  />
-	     
-	     <Button
-		    android:id="@+id/pick_friend"
-		    android:layout_height="wrap_content"
-		    android:layout_width="wrap_content"
-		    android:text="Pick Friend"  />
-
+		    android:layout_height="wrap_content">
+		    <Button
+		        android:id="@+id/map_activity"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:layout_gravity="center_horizontal"
+		        android:layout_alignParentBottom="true"
+		        android:text="MAP" />
+		    
+		     <Button
+			    android:id="@+id/get_info"
+			    android:layout_height="wrap_content"
+			    android:layout_width="wrap_content"
+			    android:text="Info Dialog Test"  />
+		     
+		     <Button
+			    android:id="@+id/pick_friend"
+			    android:layout_height="wrap_content"
+			    android:layout_width="wrap_content"
+			    android:text="Pick Friend"  />
+		</LinearLayout>  
 
 </LinearLayout>
 </android.support.v4.app.FragmentTabHost>

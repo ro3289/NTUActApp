@@ -215,6 +215,11 @@ public class MainActivity extends FragmentActivity {
 		return eventList;
 	}
 
+	public void updatePreferenceEvent(){
+		TwitterFragment eventFragment = (TwitterFragment) getSupportFragmentManager().findFragmentByTag("°¾¦nÂsÄý");
+        if(eventFragment != null) eventFragment.updatePreferenceEvent();
+	}
+	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 	    // Check which request we're responding to

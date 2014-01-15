@@ -105,6 +105,7 @@ public class Account{
 		myPreference = newPreference;
 		// Update database!!
 		new DBConnector().execute("UPDATE userlist SET Preference = " + myPreference + " WHERE ID = " + userID);
+		activity.updatePreferenceEvent();
 	}
 	/*
 	public void showMyEvent()

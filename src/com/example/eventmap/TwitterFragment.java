@@ -81,7 +81,6 @@ public class TwitterFragment extends Fragment {
     	.build();
 		imageLoader.init(config);
 		updatePreferenceEvent();
-		gridview1.setAdapter(new ItemAdapter(getActivity()));
 	}
 	
 	////////////////////////////////
@@ -197,6 +196,7 @@ public class TwitterFragment extends Fragment {
 		}
 
 	 public void updatePreferenceEvent(){
+		imageSourceList.clear();
 		int myPreference = Account.getInstance().getMyPreference();
 		HashMap<Integer,EventInfo> eventList = MainActivity.getEventList();
 	
@@ -206,6 +206,7 @@ public class TwitterFragment extends Fragment {
 		}
 		imageSource = imageSourceList.toArray(new String[imageSourceList.size()]);
 		layerCount = ((imageSource.length % 2 == 0)? (imageSource.length)/2 : (imageSource.length+1)/2);
+		gridview1.setAdapter(new ItemAdapter(getActivity()));
      }
 	 
 	 private boolean isMyPreference(int tag, int preference){

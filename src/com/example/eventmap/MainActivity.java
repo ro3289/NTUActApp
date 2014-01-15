@@ -125,7 +125,7 @@ public class MainActivity extends FragmentActivity {
         facebookLoginDialog.show();
     }
    
-    
+ /*   
     private boolean getUserInfo(String name, String pwd) {
     	// User information and preference
     	try {
@@ -155,7 +155,7 @@ public class MainActivity extends FragmentActivity {
 		}
     	return false;
 	}
-
+*/
     private void getEventInfo()
     {
     	try {
@@ -214,7 +214,7 @@ public class MainActivity extends FragmentActivity {
 			e.printStackTrace();
 		}
     }
-    
+    /*
     private void showLoginDialog(){
     	LayoutInflater layoutInflater = this.getLayoutInflater();
 		final View inflater = layoutInflater.inflate(R.layout.dialog_login, null) ;
@@ -262,7 +262,7 @@ public class MainActivity extends FragmentActivity {
 		loginDialog.setCanceledOnTouchOutside(false);
 		loginDialog.show();
     }
-    
+    */
 	public String getAppleData(){
 		return "Apple 123";
 	}
@@ -457,7 +457,7 @@ public class MainActivity extends FragmentActivity {
     
     private void checkLogin(){
         if ( ensureOpenSession() && user != null) {
-        	updateUserInfo(user.getName());
+        	updateUserInfo(user.getName(), user.getId());
         	getEventInfo();
         	getUserEvent();
         	facebookLoginDialog.dismiss();
@@ -466,20 +466,17 @@ public class MainActivity extends FragmentActivity {
         }
     }
     
-    public void updateUserInfo(String name){
+    public void updateUserInfo(String name, String id){
     	// User information and preference
     	try {
-			String accountData = new DBConnector()
-			.execute("SELECT * FROM userlist WHERE Username =" + "'" + name + "'")
-			.get();
+			String accountData = new DBConnector().execute("SELECT * FROM userlist WHERE ID =" + "'" + id + "'").get();
 			JSONArray jsonArray = new JSONArray(accountData);
 			if(jsonArray.length() != 0)
 			{
-				int    id 	      = jsonArray.getJSONObject(0).getInt("ID");
+				String userID 	  = jsonArray.getJSONObject(0).getString("ID");
 				String username   = jsonArray.getJSONObject(0).getString("Username");
-				String password   = jsonArray.getJSONObject(0).getString("Password");
 				int    preference = jsonArray.getJSONObject(0).getInt("Preference");
-				Account.updateAccount(this, id, username, password, preference);
+				Account.updateAccount(this, userID, username, preference);
 				return;
 			}
 		} catch (InterruptedException e) {
@@ -493,17 +490,16 @@ public class MainActivity extends FragmentActivity {
 			e.printStackTrace();
 		}
     	// Create new account if not
-		new DBConnector().execute("INSERT INTO userlist (Username) VALUES ('" + name + "')");
+		new DBConnector().execute("INSERT INTO userlist (Username, ID) VALUES ('" + name + "','" + id + "')");
 		try {
-			String newAccountData = new DBConnector().execute("SELECT * FROM userlist WHERE Username =" + "'" + name + "'").get();
+			String newAccountData = new DBConnector().execute("SELECT * FROM userlist WHERE ID =" + "'" + id + "'").get();
 			JSONArray newJsonArray = new JSONArray(newAccountData);
 			if(newJsonArray.length() != 0)
 			{
-				int    id 	      = newJsonArray.getJSONObject(0).getInt("ID");
+				String userID     = newJsonArray.getJSONObject(0).getString("ID");
 				String username   = newJsonArray.getJSONObject(0).getString("Username");
-				String password   = newJsonArray.getJSONObject(0).getString("Password");
 				int    preference = newJsonArray.getJSONObject(0).getInt("Preference");
-				Account.updateAccount(this, id, username, password, preference);
+				Account.updateAccount(this, userID, username, preference);
 				return;
 			}
 		} catch (InterruptedException e) {
@@ -516,7 +512,7 @@ public class MainActivity extends FragmentActivity {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		updateUserInfo(name);
+		updateUserInfo(name, id);
     }
     
     private boolean ensureOpenSession() {

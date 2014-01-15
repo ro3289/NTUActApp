@@ -392,7 +392,9 @@ public class MapActivity extends Activity implements OnInfoWindowClickListener{
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 				// EventDialog.getInstance().showEventInfoDialog(eventList.get(searchEventIdList.get(which)), null);
-				map.moveCamera(CameraUpdateFactory.newLatLngZoom(eventList.get(searchEventIdList.get(which)).point, 16));
+				EventInfo event = eventList.get(searchEventIdList.get(which));
+				map.moveCamera(CameraUpdateFactory.newLatLngZoom(event.point, 16));
+				
 			}
 		})
 	    // Specify the list array, the items to be selected by default (null for none),

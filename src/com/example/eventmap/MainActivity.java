@@ -568,7 +568,7 @@ public class MainActivity extends FragmentActivity {
 				ArrayList<String> myEventImageList 	 = new ArrayList<String>();
 				for(int index = 0; index < jsonArray.length(); ++index) {
 					int eventID = jsonArray.getJSONObject(index).getInt("ID");
-					System.out.println(eventList.get(eventID).name);
+					searchEventIdList.add(eventID);
 					myEventNameList.add(eventList.get(eventID).name);
 					myEventContentList.add(eventList.get(eventID).content);
 					myEventImageList.add(eventList.get(eventID).image);

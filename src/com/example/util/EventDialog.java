@@ -26,7 +26,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.eventmap.FacebookFragment;
+import com.example.eventmap.FriendPickerApplication;
+import com.example.eventmap.InviteFriendsActivity;
 import com.example.eventmap.R;
+import com.facebook.Session;
+import com.facebook.model.GraphUser;
 import com.facebook.widget.ProfilePictureView;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -46,7 +50,10 @@ public class EventDialog {
 	private DisplayImageOptions options;
 	private ArrayList<String> eventGuestsList = new ArrayList<String>();
 	private ArrayList<String> eventGuestsNameList = new ArrayList<String>();
+	private ArrayList<String> inviteList = new ArrayList<String>();
+	private ArrayList<String> inviteNameList = new ArrayList<String>();
 	private int eventGuests;
+	private static final int INVITE_FRIENDS_ACTIVITY = 3;
 	
 	public static void setUpEventDialog(Activity a){
 		getInstance().activity = a;
@@ -115,6 +122,37 @@ public class EventDialog {
 				guestsButton.setText("有" + eventGuests + "人追蹤中");
 			}
 		});
+		final Button inviteButton = (Button) inflater.findViewById(R.id.invite_button);
+		inviteButton.setText("邀請朋友");
+		inviteButton.setOnClickListener(new Button.OnClickListener(){
+			@Override
+			public void onClick(View v) {
+				if (Session.getActiveSession() == null || !Session.getActiveSession().isOpened())
+				{
+				}
+				else
+				{
+			            Intent intent = new Intent(inflater.getContext(), InviteFriendsActivity.class);
+			            // Note: The following line is optional, as multi-select behavior is the default for
+			            // FriendPickerFragment. It is here to demonstrate how parameters could be passed to the
+			            // friend picker if single-select functionality was desired, or if a different user ID was
+			            // desired (for instance, to see friends of a friend).
+			            
+			            InviteFriendsActivity.populateParameters(intent, Account.INSTANCE.getUserID(), true, true);
+			            activity.startActivityForResult(intent, INVITE_FRIENDS_ACTIVITY);
+				}
+			}
+			
+		});
+		final Button inviteListButton = (Button) inflater.findViewById(R.id.invitelist_button);
+		inviteListButton.setText("受邀朋友");
+		inviteListButton.setOnClickListener(new Button.OnClickListener(){
+			@Override
+			public void onClick(View v) {
+				showInviteList(event);
+			}
+			
+		});
 		AlertDialog eventDialog = new AlertDialog.Builder(activity)
         .setView(inflater)
         .setPositiveButton(R.string.visit,
@@ -136,6 +174,7 @@ public class EventDialog {
                 	if(eventListFragment != null){
                 		eventListFragment.updateEventList();
                 	}
+                	getInviteFriends(event);
                 }
             }
         ).create();
@@ -194,6 +233,7 @@ public class EventDialog {
 	}
 	
 	private void showGuestsList(){
+		
 		String[] guestsList = eventGuestsNameList.toArray(new String[eventGuestsNameList.size()]);
 		ListItemAdapter myListItemAdapter = new ListItemAdapter(activity, R.layout.listview_event_guests, guestsList);
 		new AlertDialog.Builder(activity)
@@ -203,6 +243,109 @@ public class EventDialog {
 	    // Specify the list array, the items to be selected by default (null for none),
 	    // and the listener through which to receive callbacks when items are selected
        .show();
+	}
+	
+	private void showInviteList(EventInfo e){
+		FriendPickerApplication application = (FriendPickerApplication) activity.getApplication();
+		List<GraphUser> inviteUsers = application.getInviteUsers();
+		System.out.println("hi1");
+		if (inviteUsers!=null && inviteUsers.size()!=0) {
+        	inviteList=new ArrayList<String>();
+        	System.out.println("hi2");
+    		for(final GraphUser inviteUser:inviteUsers)
+        	{
+        		
+    			String result2;
+				try {
+					result2 = new DBConnector().execute("SELECT * FROM userlist WHERE ID ="+inviteUser.getId()).get();
+				
+        		JSONArray jsonArray = new JSONArray(result2);
+                for(int index = 0; index < jsonArray.length(); ++index){
+                        String userID = jsonArray.getJSONObject(index).getString("ID");
+                        inviteList.add(inviteUser.getId());
+            			inviteNameList.add(inviteUser.getName());
+            			
+                }
+				} catch (InterruptedException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (ExecutionException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (JSONException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+        	}
+    		System.out.println("hi3");
+        	if(inviteList.size()!=0)
+            {
+        		System.out.println("hi4");
+              	for(int index=0;index<inviteList.size();++index)
+               	{
+              		String result2;
+					try {
+						result2 = new DBConnector().execute("SELECT * FROM invitation WHERE userID ="+inviteList.get(index)+" AND inviteID ="+Account.INSTANCE.getUserID()+" AND actID = "+e.id).get();
+					
+            		JSONArray jsonArray = new JSONArray(result2);
+                    for(int index2 = 0; index2 < jsonArray.length(); ++index2){
+                    	//String result = new DBConnector().execute("UPDATE invitation (userID,inviteID,actID) VALUES ("+inviteUser.getId()+","+	Account.INSTANCE.getUserID()+","+e.id+")").get();
+                			
+                    }
+					} catch (InterruptedException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					} catch (ExecutionException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					} catch (JSONException e1) {
+						// TODO Auto-generated catch block
+						//e1.printStackTrace();
+						try {
+							String result = new DBConnector().execute("INSERT INTO invitation (userID,inviteID,actID) VALUES ("+inviteList.get(index)+","+	Account.INSTANCE.getUserID()+","+e.id+")").get();
+						} catch (InterruptedException e2) {
+							// TODO Auto-generated catch block
+							e2.printStackTrace();
+						} catch (ExecutionException e2) {
+							// TODO Auto-generated catch block
+							e2.printStackTrace();
+						}
+					}
+               	}
+            }
+        	
+        	
+    	
+		}else {
+			System.out.println("no user");
+    	
+		}
+        System.out.println("herehere");
+        if(inviteList!=null&&inviteList.size()!=0)
+        {
+        	String[] getInviteList = inviteList.toArray(new String[inviteList.size()]);
+    		ListItemAdapter2 myListItemAdapter = new ListItemAdapter2(activity, R.layout.listview_invite, getInviteList);
+    		new AlertDialog.Builder(activity)
+    	    // Set the dialog title
+    		.setTitle("追蹤此活動的人")
+    		.setAdapter( myListItemAdapter, null)
+    	    // Specify the list array, the items to be selected by default (null for none),
+    	    // and the listener through which to receive callbacks when items are selected
+           .show();
+        }
+        else
+        {
+        	
+        }
+		
+		
+		
+		
+		
+		
+		
+		
+
 	}
 	
 	public class ListItemAdapter extends ArrayAdapter<String> {
@@ -228,5 +371,101 @@ public class EventDialog {
 		   return row;
 		  }
 	}
+	public class ListItemAdapter2 extends ArrayAdapter<String> {
+		
+		  Context myContext;
+		
+		  public ListItemAdapter2(Context context, int textViewResourceId, String[] objects) {
+			  super(context, textViewResourceId, objects);
+			  myContext = context;
+		  } 
+			  @Override
+			  public View getView(int position, View convertView, ViewGroup parent) {
+			   
+			   LayoutInflater inflater = (LayoutInflater) myContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+			   View row = inflater.inflate(R.layout.listview_invite, parent, false);
+			   
+			   ProfilePictureView profilePictureView = (ProfilePictureView) row.findViewById(R.id.profilePicture);
+			   profilePictureView.setProfileId(inviteList.get(position));
+			   
+			   TextView guestName = (TextView)row.findViewById(R.id.guest_name);
+			   guestName.setText(inviteNameList.get(position));
+			   
+			   return row;
+			  }
+		}
 
+	private void getInviteFriends(EventInfo e){
+		FriendPickerApplication application = (FriendPickerApplication) activity.getApplication();
+        List<GraphUser> inviteUsers = application.getInviteUsers();
+        if (inviteUsers != null&&inviteUsers.size()!=0) {
+        	inviteList=new ArrayList<String>();
+        		for(final GraphUser inviteUser:inviteUsers)
+            	{
+            		
+        			String result2;
+					try {
+						result2 = new DBConnector().execute("SELECT * FROM userlist WHERE ID ="+inviteUser.getId()).get();
+					
+            		JSONArray jsonArray = new JSONArray(result2);
+                    for(int index = 0; index < jsonArray.length(); ++index){
+                            String userID = jsonArray.getJSONObject(index).getString("ID");
+                            inviteList.add(inviteUser.getId());
+                			inviteNameList.add(inviteUser.getName());
+                			
+                    }
+					} catch (InterruptedException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					} catch (ExecutionException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					} catch (JSONException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+            	}
+            	if(inviteList.size()!=0)
+                {
+                  	for(int index=0;index<inviteList.size();++index)
+                   	{
+                  		String result2;
+    					try {
+    						result2 = new DBConnector().execute("SELECT * FROM invitation WHERE userID ='"+inviteList.get(index)+"' AND inviteID ='"+Account.INSTANCE.getUserID()+"' AND actID = '"+e.id+"'").get();
+    					
+                		JSONArray jsonArray = new JSONArray(result2);
+                        for(int index2 = 0; index2 < jsonArray.length(); ++index2){
+                        	//String result = new DBConnector().execute("UPDATE invitation (userID,inviteID,actID) VALUES ("+inviteUser.getId()+","+	Account.INSTANCE.getUserID()+","+e.id+")").get();
+                    			
+                        }
+    					} catch (InterruptedException e1) {
+    						// TODO Auto-generated catch block
+    						e1.printStackTrace();
+    					} catch (ExecutionException e1) {
+    						// TODO Auto-generated catch block
+    						e1.printStackTrace();
+    					} catch (JSONException e1) {
+    						// TODO Auto-generated catch block
+    						//e1.printStackTrace();
+    						try {
+								String result = new DBConnector().execute("INSERT INTO invitation (userID,inviteID,actID) VALUES ("+inviteList.get(index)+","+	Account.INSTANCE.getUserID()+","+e.id+")").get();
+							} catch (InterruptedException e2) {
+								// TODO Auto-generated catch block
+								e2.printStackTrace();
+							} catch (ExecutionException e2) {
+								// TODO Auto-generated catch block
+								e2.printStackTrace();
+							}
+    					}
+                   	}
+                }
+            	
+            	
+        	
+        }else {
+        	System.out.println("no user");
+        	
+        }
+	}
+	
 }

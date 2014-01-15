@@ -27,7 +27,7 @@ import com.nostra13.universalimageloader.core.assist.ImageLoadingListener;
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
 import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
 
-
+//my event
 public class FacebookFragment extends ListFragment {
 
 	private ImageLoader imageLoader = ImageLoader.getInstance();

@@ -26,12 +26,16 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.eventmap.FacebookFragment;
+<<<<<<< HEAD
 import com.example.eventmap.FriendPickerApplication;
 import com.example.eventmap.InviteFriendsActivity;
 import com.example.eventmap.MainActivity;
 import com.example.eventmap.R;
 import com.facebook.Session;
 import com.facebook.model.GraphUser;
+=======
+import com.example.eventmap.R;
+>>>>>>> fb_version
 import com.facebook.widget.ProfilePictureView;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -244,7 +248,6 @@ public class EventDialog {
 	    // Specify the list array, the items to be selected by default (null for none),
 	    // and the listener through which to receive callbacks when items are selected
        .show();
-
 	}
 	
 	private void showInviteList(EventInfo e){

@@ -5,8 +5,11 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import org.json.JSONArray;
@@ -15,12 +18,19 @@ import org.json.JSONException;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.util.DBConnector;
@@ -33,12 +43,18 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.assist.ImageLoadingListener;
+import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
+import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
 
 public class MapActivity extends Activity implements OnInfoWindowClickListener{
 
 	private GoogleMap 	map;
 	private HashMap<Marker,EventInfo> eventHashMap = new HashMap<Marker,EventInfo>();
-
+	private HashMap<Integer, EventInfo> eventList = new HashMap<Integer, EventInfo>();
+	
     private Button startDateButton, endDateButton, searchButton, resetButton;
     private Calendar calendar;
     private int mYear, mMonth, mDay;
@@ -66,10 +82,13 @@ public class MapActivity extends Activity implements OnInfoWindowClickListener{
         setCalendar();
         constructMap();
         setButton();
+        searchText = (EditText) findViewById(R.id.searchText);
         EventDialog.setUpEventDialog(this);
 	}
-
-	// Method
+	
+	////////////////////////////////
+	/////////// Method//////////////
+	////////////////////////////////
 	
 	private void constructMap()
 	{
@@ -98,7 +117,6 @@ public class MapActivity extends Activity implements OnInfoWindowClickListener{
 					e.printStackTrace();
 				}
 			}
-			
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -111,10 +129,11 @@ public class MapActivity extends Activity implements OnInfoWindowClickListener{
 		}
 	}
 	
-	private void createEvent(int ID, String Name, String Location, String url, String image, String Content, LatLng position, Date date, int tag) 
+	private void createEvent(int id, String name, String location, String url, String image, String content, LatLng position, Date date, int tag) 
 	{
-		EventInfo event = new EventInfo(ID, Name, Location, url, image, Content, date, tag);
-		Marker marker = map.addMarker(new MarkerOptions().position(position).title(Name));
+		EventInfo event = new EventInfo(id, name, location, position, url, image, content, date, tag);
+		Marker marker = map.addMarker(new MarkerOptions().position(position).title(name));
+		eventList.put(event.id, event);
 		eventHashMap.put(marker, event);
 		map.moveCamera(CameraUpdateFactory.newLatLngZoom(position, 15));
 		dateFilterResult.add(marker);
@@ -320,10 +339,117 @@ public class MapActivity extends Activity implements OnInfoWindowClickListener{
         });
 	}
 	
+	private String[] myEventName;
+	private String[] myEventContent;
+	private String[] myEventImage;
+	private ArrayList<Integer> searchEventIdList = new ArrayList<Integer>();
+	protected EditText searchText;
+	private DisplayImageOptions options;
+	private ImageLoader imageLoader = ImageLoader.getInstance();
+	
+	
+    public void searchEvent(View view){
+    	searchEventIdList.clear();
+    	try {
+			if(searchText.getText().toString().equals("")) {
+				System.out.println("thisline");
+			} else {
+	    		String myEventData = new DBConnector().execute("SELECT * FROM activity WHERE Name LIKE '%"+searchText.getText().toString()+"%' OR Content LIKE '%"+searchText.getText().toString()+"%'").get();
+				JSONArray jsonArray = new JSONArray(myEventData);
+				ArrayList<String> myEventNameList 	 = new ArrayList<String>();
+				ArrayList<String> myEventContentList = new ArrayList<String>();
+				ArrayList<String> myEventImageList 	 = new ArrayList<String>();
+				for(int index = 0; index < jsonArray.length(); ++index) {
+					int eventID = jsonArray.getJSONObject(index).getInt("ID");
+					myEventNameList.add(eventList.get(eventID).name);
+					myEventContentList.add(eventList.get(eventID).content);
+					myEventImageList.add(eventList.get(eventID).image);
+					searchEventIdList.add(eventID);
+				}
+			
+				myEventName = myEventNameList.toArray(new String[myEventNameList.size()]);
+				myEventContent = myEventContentList.toArray(new String[myEventContentList.size()]);
+				myEventImage = myEventImageList.toArray(new String[myEventImageList.size()]);
+				showSearchList();
+			}
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    }
+    private void showSearchList(){
+		ListItemAdapter myListItemAdapter = new ListItemAdapter(this, R.layout.listview_search, myEventName);
+		new AlertDialog.Builder(this)
+	    // Set the dialog title
+		.setTitle("Search")
+		.setAdapter( myListItemAdapter, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				// EventDialog.getInstance().showEventInfoDialog(eventList.get(searchEventIdList.get(which)), null);
+				map.moveCamera(CameraUpdateFactory.newLatLngZoom(eventList.get(searchEventIdList.get(which)).point, 16));
+			}
+		})
+	    // Specify the list array, the items to be selected by default (null for none),
+	    // and the listener through which to receive callbacks when items are selected
+       .show();
+	}
+    
+    public class ListItemAdapter extends ArrayAdapter<String> {
+    private ImageLoadingListener animateFirstListener = new AnimateFirstDisplayListener();
+  	  Context myContext;
+  	
+  	  public ListItemAdapter(Context context, int textViewResourceId, String[] objects) {
+  		  super(context, textViewResourceId, objects);
+  		  myContext = context;
+  	  } 
+  		  @Override
+  		  public View getView(int position, View convertView, ViewGroup parent) {
+  		   
+  		   LayoutInflater inflater = (LayoutInflater) myContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+  		   View row = inflater.inflate(R.layout.listview_search, parent, false);
+  		   TextView eventName = (TextView)row.findViewById(R.id.event_name);
+		   eventName.setText(myEventName[position]);
+		   
+		   TextView eventContent = (TextView)row.findViewById(R.id.event_content);
+		   eventContent.setText(myEventContent[position]);
+		   
+		   ImageView image=(ImageView)row.findViewById(R.id.image);
+		   imageLoader.displayImage(myEventImage[position], image, options, animateFirstListener);
+
+  		   return row;
+  		  }
+  	}
+    private static class AnimateFirstDisplayListener extends SimpleImageLoadingListener {
+
+		static final List<String> displayedImages = Collections.synchronizedList(new LinkedList<String>());
+
+		@Override
+		public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
+			if (loadedImage != null) {
+				ImageView imageView = (ImageView) view;
+				boolean firstDisplay = !displayedImages.contains(imageUri);
+				if (firstDisplay) {
+					FadeInBitmapDisplayer.animate(imageView, 500);
+				} else {
+					imageView.setImageBitmap(loadedImage);
+				}
+				displayedImages.add(imageUri);
+			}
+		}
+	}
+	
 	@Override
 	public void onBackPressed() {
 	    Intent myIntent = new Intent(MapActivity.this, MainActivity.class);
 	    setResult(0,myIntent);
         finish();
 	}
+	
+	
 }

@@ -5,6 +5,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.concurrent.ExecutionException;
 
 import org.json.JSONArray;
@@ -13,7 +15,9 @@ import org.json.JSONException;
 import com.example.pageviewitem.ViewPagerItem;
 import com.example.util.Account;
 import com.example.util.DBConnector;
+import com.example.util.EventDialog;
 import com.example.util.EventInfo;
+import com.facebook.model.GraphUser;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
@@ -43,8 +47,12 @@ public class TwitterFragment extends Fragment {
 	private DisplayImageOptions options;
 	private GridView gridview1;
 	private ArrayList<String> imageSourceList = new ArrayList<String>();
+	private ArrayList<Integer> eventIdList = new ArrayList<Integer>();
 	private String[] imageSource;
 	private int layerCount;
+	
+	private HashMap<Integer, ArrayList<GraphUser>> eventToFriend = new HashMap<Integer, ArrayList<GraphUser>>();
+	
 
 	@Override
 	public void onAttach(Activity activity) {
@@ -80,7 +88,11 @@ public class TwitterFragment extends Fragment {
     	.defaultDisplayImageOptions(options)
     	.build();
 		imageLoader.init(config);
-		updatePreferenceEvent();
+		if(((MainActivity)getActivity()).MY_PREFERENCE){
+			updatePreferenceEvent();
+		} else {
+			updateMyFriendEvent();
+		}
 	}
 	
 	////////////////////////////////
@@ -119,7 +131,7 @@ public class TwitterFragment extends Fragment {
 			public int getItemViewType(int position) {  
 			    int type = super.getItemViewType(position);  
 			    try {  
-			    	if(((imageSource.length % 2 == 1) && (position + 1 == imageSource.length))){
+			    	if(((imageSource.length % 2 == 1) && (position * 2 + 1 == imageSource.length))){
 			    		type = 0;
 			    	}else{
 			    		type = 1;
@@ -149,14 +161,25 @@ public class TwitterFragment extends Fragment {
 						holder.image1.setOnClickListener(new OnClickListener(){
 							@Override
 						    public void onClick(View v) {
-								Intent myIntent=new Intent(v.getContext(), ViewPagerItem.class);
-				                startActivityForResult(myIntent,1);
+								EventDialog.getInstance().showEventInfoDialog(MainActivity.getEventList().get((eventIdList.get(position*2))), null);
 						    }
 						});
 					}else {
 						view =  LayoutInflater.from(mContext).inflate(R.layout.list_item2, parent, false);
 						holder.image1 = (ImageView) view.findViewById(R.id.image2);
+						holder.image1.setOnClickListener(new OnClickListener(){
+							@Override
+						    public void onClick(View v) {
+								EventDialog.getInstance().showEventInfoDialog(MainActivity.getEventList().get((eventIdList.get(position*2))), null);
+						    }
+						});
 						holder.image2 = (ImageView) view.findViewById(R.id.image3);
+						holder.image2.setOnClickListener(new OnClickListener(){
+							@Override
+						    public void onClick(View v) {
+								EventDialog.getInstance().showEventInfoDialog(MainActivity.getEventList().get((eventIdList.get(position*2+1))), null);
+						    }
+						});
 					}
 					view.setTag(holder);
 				}else {
@@ -197,12 +220,15 @@ public class TwitterFragment extends Fragment {
 
 	 public void updatePreferenceEvent(){
 		imageSourceList.clear();
+		eventIdList.clear();
 		int myPreference = Account.getInstance().getMyPreference();
 		HashMap<Integer,EventInfo> eventList = MainActivity.getEventList();
 	
 		for(EventInfo event : eventList.values()){
-			if(isMyPreference(event.tagValue, myPreference))
-			imageSourceList.add(event.image);
+			if(isMyPreference(event.tagValue, myPreference)){
+				imageSourceList.add(event.image);
+				eventIdList.add(event.id);
+			}
 		}
 		imageSource = imageSourceList.toArray(new String[imageSourceList.size()]);
 		layerCount = ((imageSource.length % 2 == 0)? (imageSource.length)/2 : (imageSource.length+1)/2);
@@ -212,5 +238,49 @@ public class TwitterFragment extends Fragment {
 	 private boolean isMyPreference(int tag, int preference){
 		 return ((tag & preference) == preference);
 	 }
-	
+	 
+	 public void updateMyFriendEvent(){
+		 imageSourceList.clear();
+		 eventIdList.clear();
+		 eventToFriend.clear();
+		 HashMap<Integer,EventInfo> eventList = MainActivity.getEventList();
+		 
+		 FriendPickerApplication application = (FriendPickerApplication) getActivity().getApplication();
+         List<GraphUser> selectedUsers = application.getSelectedUsers();
+         if (selectedUsers != null) {
+        	 for(GraphUser friend : selectedUsers){
+        		String friendEvent;
+				try {
+					friendEvent = new DBConnector().execute("SELECT ActID FROM user_act WHERE UserID = '" + friend.getId() + "'").get();
+					 JSONArray jsonArray = new JSONArray(friendEvent);
+	        		 for(int index = 0; index < jsonArray.length(); ++index){
+	        			 int eventID = jsonArray.getJSONObject(index).getInt("ActID");
+	        			 if(eventToFriend.containsKey(eventID)){
+	        				 eventToFriend.get(eventID).add(friend);
+	        			 } else {
+	        				 ArrayList<GraphUser> newList = new ArrayList<GraphUser>();
+	        				 newList.add(friend);
+	        				 eventToFriend.put(eventID, newList);
+	        			 }
+	        		 }
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (ExecutionException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+    		 }
+         }
+         for(Integer eventID : eventToFriend.keySet()){
+        	 imageSourceList.add(eventList.get(eventID).image);
+        	 eventIdList.add(eventID);
+         }
+		 imageSource = imageSourceList.toArray(new String[imageSourceList.size()]);
+		 layerCount = ((imageSource.length % 2 == 0)? (imageSource.length)/2 : (imageSource.length+1)/2);
+		 gridview1.setAdapter(new ItemAdapter(getActivity()));
+	 }
 }

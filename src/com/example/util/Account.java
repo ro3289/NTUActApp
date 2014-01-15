@@ -58,7 +58,6 @@ public class Account{
 			}else{
 				checkedItems[i] = false;
 			}
-			
 		}
 		new AlertDialog.Builder(activity)
 	    // Set the dialog title
@@ -105,6 +104,7 @@ public class Account{
 		myPreference = newPreference;
 		// Update database!!
 		new DBConnector().execute("UPDATE userlist SET Preference = " + myPreference + " WHERE ID = " + userID);
+		activity.updatePreferenceEvent();
 	}
 	/*
 	public void showMyEvent()
@@ -193,6 +193,10 @@ public class Account{
 	
 	public String getUserID(){
 		return userID;
+	}
+	
+	public String getUserName(){
+		return username;
 	}
 	
 	public int getMyPreference(){

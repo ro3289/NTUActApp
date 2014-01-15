@@ -82,7 +82,7 @@ public class FacebookLogin extends FragmentActivity{
             pendingAction = PendingAction.valueOf(name);
         }
 
-        setContentView(R.layout.facebook_layout);
+        setContentView(R.layout.layout_facebook_login);
 
         loginButton = (LoginButton) findViewById(R.id.login_button);
         loginButton.setUserInfoChangedCallback(new LoginButton.UserInfoChangedCallback() {

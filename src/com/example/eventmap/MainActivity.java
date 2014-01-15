@@ -2,12 +2,15 @@ package com.example.eventmap;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -28,13 +31,18 @@ import com.example.util.EventInfo;
 import com.facebook.AppEventsLogger;
 import com.facebook.FacebookAuthorizationException;
 import com.facebook.FacebookOperationCanceledException;
+import com.facebook.FacebookRequestError;
+import com.facebook.Request;
+import com.facebook.Response;
 import com.facebook.Session;
 import com.facebook.SessionState;
 import com.facebook.UiLifecycleHelper;
+import com.facebook.model.GraphObject;
 import com.facebook.model.GraphPlace;
 import com.facebook.model.GraphUser;
 import com.facebook.widget.FacebookDialog;
 import com.facebook.widget.LoginButton;
+import com.facebook.widget.ProfilePictureView;
 
 public class MainActivity extends FragmentActivity {
 
@@ -215,6 +223,11 @@ public class MainActivity extends FragmentActivity {
 		return eventList;
 	}
 
+	public void updatePreferenceEvent(){
+		TwitterFragment eventFragment = (TwitterFragment) getSupportFragmentManager().findFragmentByTag("°¾¦nÂsÄý");
+        if(eventFragment != null) eventFragment.updatePreferenceEvent();
+	}
+	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 	    // Check which request we're responding to
@@ -247,6 +260,7 @@ public class MainActivity extends FragmentActivity {
     private GraphPlace place;
     private List<GraphUser> tags;
 	private boolean pickFriendsWhenSessionOpened;
+	private ProfilePictureView profilePictureView;
 	private static final int PICK_FRIENDS_ACTIVITY = 2;
 
     private enum PendingAction {
@@ -338,7 +352,7 @@ public class MainActivity extends FragmentActivity {
     
     private void setUpFacebookLoginDialog() {
     	LayoutInflater layoutInflater = this.getLayoutInflater();
-		final View inflater = layoutInflater.inflate(R.layout.facebook_layout, null) ;
+		final View inflater = layoutInflater.inflate(R.layout.layout_facebook_login, null) ;
 		loginButton = (LoginButton) inflater.findViewById(R.id.login_button);
 	    loginButton.setUserInfoChangedCallback(new LoginButton.UserInfoChangedCallback() {
             @Override
@@ -449,5 +463,39 @@ public class MainActivity extends FragmentActivity {
         } else {
             pickFriendsWhenSessionOpened = true;
         }
+    }
+    
+    
+    public void parseMyFacebookEvent() {
+    	String requestIdsText = "/" + user.getId() +"/events";
+    	String[] requestIds = requestIdsText.split(",");
+    	Session session = Session.getActiveSession();
+    	Session.NewPermissionsRequest newPermissionsRequest = new Session
+  		      .NewPermissionsRequest(this, Arrays.asList("user_events"));
+    	session.requestNewPublishPermissions(newPermissionsRequest);
+        List<Request> requests = new ArrayList<Request>();
+        for (final String requestId : requestIds) {
+            requests.add(new Request(Session.getActiveSession(), requestId, null, null, new Request.Callback() {
+                public void onCompleted(Response response) {
+                    GraphObject graphObject = response.getGraphObject();
+                    FacebookRequestError error = response.getError();
+                    String s = "";
+                    if (graphObject != null) {
+                        JSONObject jsonObject = graphObject.getInnerJSONObject();
+                        try {
+	                         JSONArray array = jsonObject.getJSONArray("data");
+	                         for (int i = 0; i < array.length(); i++) {
+	                             JSONObject object = (JSONObject) array.get(i);
+	                             System.out.println(object.get("id"));
+	                          }
+                        } catch (JSONException e) {
+                        	e.printStackTrace();
+	                    }
+                    }
+                }
+            }));
+        }
+        //pendingRequest = false;
+        Request.executeBatchAndWait(requests);
     }
 }

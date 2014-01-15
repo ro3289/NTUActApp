@@ -51,6 +51,7 @@ public class MainActivity extends FragmentActivity {
 	private AlertDialog facebookLoginDialog;
 	private static int MY_EVENT_FRAGMENT = 0;
 	private static int HOT_EVENT_FRAGMENT = 1;
+	public boolean MY_PREFERENCE = true;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -130,10 +131,12 @@ public class MainActivity extends FragmentActivity {
             public void onClick(View v) {
             	if(switchButton.getText().equals("朋友活動")){
             		switchButton.setText("我的偏好");
-            		//switchToMypreference();
+            		MY_PREFERENCE = false;
+            		updateMyFriendEvent();
             	} else {
             		switchButton.setText("朋友活動");
-            		switchToFriendPreference();
+            		MY_PREFERENCE = true;
+            		updatePreferenceEvent();
             	}
             }
         });
@@ -242,8 +245,9 @@ public class MainActivity extends FragmentActivity {
         if(eventFragment != null) eventFragment.updatePreferenceEvent();
 	}
 	
-	private void switchToFriendPreference(){
-
+	private void updateMyFriendEvent(){
+		TwitterFragment eventFragment = (TwitterFragment) getSupportFragmentManager().findFragmentByTag("偏好瀏覽");
+        if(eventFragment != null) eventFragment.updateMyFriendEvent();
 	}
 	
 	@Override
@@ -258,7 +262,7 @@ public class MainActivity extends FragmentActivity {
 	    	AppleFragment eventFragment = (AppleFragment)getSupportFragmentManager().findFragmentByTag("熱門活動");
 	        if(eventFragment != null) eventFragment.updateHotEvent();
 	    }else if (requestCode == PICK_FRIENDS_ACTIVITY){
-	    	
+	    	updateMyFriendEvent();
 	    }
 	    uiHelper.onActivityResult(requestCode, resultCode, data, dialogCallback);
 	}

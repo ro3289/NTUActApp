@@ -9,12 +9,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         class="com.google.android.gms.maps.MapFragment" />
-    <Button 
-        android:id="@+id/tag_button"
-        android:layout_width="wrap_content" 
-        android:layout_height="wrap_content" 
-        android:text="Tag" 
-        android:layout_alignParentRight="true"/>
     
     <Button 
         android:id="@+id/start_date_button"
@@ -34,11 +28,18 @@
         android:text="Search" 
         android:layout_toRightOf="@id/end_date_button"/>
     <Button 
+        android:id="@+id/tag_button"
+        android:layout_width="wrap_content" 
+        android:layout_height="wrap_content" 
+        android:text="Tag" 
+        android:layout_toRightOf="@id/search_button"/>
+    <Button 
         android:id="@+id/reset_button"
         android:layout_width="wrap_content" 
         android:layout_height="wrap_content" 
         android:text="Reset" 
-        android:layout_toRightOf="@id/search_button"/>
+        android:layout_toRightOf="@id/tag_button"/>
+
     
     <TextView  
         android:id="@+id/start_date_text"
@@ -51,11 +52,12 @@
 	    android:layout_height="wrap_content" 
 	    android:layout_below="@id/end_date_button"
 	    android:layout_toRightOf="@id/start_date_text"/>
+    
     <include
 	    android:id="@+id/search"
 	    android:layout_width="wrap_content"
 	    android:layout_height="wrap_content"
-	    android:layout_alignParentBottom="true"
+	    android:layout_toRightOf="@id/reset_button"
 	    layout="@layout/search" />
     
     

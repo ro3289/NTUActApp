@@ -31,6 +31,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.example.util.Account;
@@ -291,9 +292,9 @@ public class MainActivity extends FragmentActivity {
 	    uiHelper.onActivityResult(requestCode, resultCode, data, dialogCallback);
 	}
 	
-	/////////////////////////
-	//////////Facebook///////
-	/////////////////////////
+	///////////////////////////
+	//////////Facebook/////////
+	///////////////////////////
 	
     private final String PENDING_ACTION_BUNDLE_KEY = "com.facebook.samples.hellofacebook:PendingAction";
 
@@ -549,12 +550,13 @@ public class MainActivity extends FragmentActivity {
 	private String[] myEventContent;
 	private String[] myEventImage;
 	protected EditText searchText;
+	private ArrayList<Integer> searchEventIdList = new ArrayList<Integer>();
 	private DisplayImageOptions options;
 	private ImageLoader imageLoader = ImageLoader.getInstance();
 	
 	
     public void searchEvent(View view){
-    	
+    	searchEventIdList.clear();
     	try {
 			if(searchText.getText().toString().equals("")) {
 				System.out.println("thisline");
@@ -593,7 +595,12 @@ public class MainActivity extends FragmentActivity {
 		new AlertDialog.Builder(this)
 	    // Set the dialog title
 		.setTitle("Search")
-		.setAdapter( myListItemAdapter, null)
+		.setAdapter( myListItemAdapter, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				EventDialog.getInstance().showEventInfoDialog(eventList.get(searchEventIdList.get(which)), null);
+			}
+		})
 	    // Specify the list array, the items to be selected by default (null for none),
 	    // and the listener through which to receive callbacks when items are selected
        .show();
@@ -620,10 +627,12 @@ public class MainActivity extends FragmentActivity {
 		   
 		   ImageView image=(ImageView)row.findViewById(R.id.image);
 		   imageLoader.displayImage(myEventImage[position], image, options, animateFirstListener);
-
-  		   
+		   
   		   return row;
   		  }
+  		  
+  		
+  		  
   	}
     private static class AnimateFirstDisplayListener extends SimpleImageLoadingListener {
 

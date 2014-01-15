@@ -342,13 +342,14 @@ public class MapActivity extends Activity implements OnInfoWindowClickListener{
 	private String[] myEventName;
 	private String[] myEventContent;
 	private String[] myEventImage;
+	private ArrayList<Integer> searchEventIdList = new ArrayList<Integer>();
 	protected EditText searchText;
 	private DisplayImageOptions options;
 	private ImageLoader imageLoader = ImageLoader.getInstance();
 	
 	
     public void searchEvent(View view){
-    	
+    	searchEventIdList.clear();
     	try {
 			if(searchText.getText().toString().equals("")) {
 				System.out.println("thisline");
@@ -363,6 +364,7 @@ public class MapActivity extends Activity implements OnInfoWindowClickListener{
 					myEventNameList.add(eventList.get(eventID).name);
 					myEventContentList.add(eventList.get(eventID).content);
 					myEventImageList.add(eventList.get(eventID).image);
+					searchEventIdList.add(eventID);
 				}
 			
 				myEventName = myEventNameList.toArray(new String[myEventNameList.size()]);
@@ -386,12 +388,18 @@ public class MapActivity extends Activity implements OnInfoWindowClickListener{
 		new AlertDialog.Builder(this)
 	    // Set the dialog title
 		.setTitle("Search")
-		.setAdapter( myListItemAdapter, null)
+		.setAdapter( myListItemAdapter, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				// EventDialog.getInstance().showEventInfoDialog(eventList.get(searchEventIdList.get(which)), null);
+				map.moveCamera(CameraUpdateFactory.newLatLngZoom(eventList.get(searchEventIdList.get(which)).point, 16));
+			}
+		})
 	    // Specify the list array, the items to be selected by default (null for none),
 	    // and the listener through which to receive callbacks when items are selected
        .show();
-
 	}
+    
     public class ListItemAdapter extends ArrayAdapter<String> {
     private ImageLoadingListener animateFirstListener = new AnimateFirstDisplayListener();
   	  Context myContext;
@@ -405,7 +413,7 @@ public class MapActivity extends Activity implements OnInfoWindowClickListener{
   		   
   		   LayoutInflater inflater = (LayoutInflater) myContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
   		   View row = inflater.inflate(R.layout.listview_search, parent, false);
-  		 TextView eventName = (TextView)row.findViewById(R.id.event_name);
+  		   TextView eventName = (TextView)row.findViewById(R.id.event_name);
 		   eventName.setText(myEventName[position]);
 		   
 		   TextView eventContent = (TextView)row.findViewById(R.id.event_content);
@@ -414,7 +422,6 @@ public class MapActivity extends Activity implements OnInfoWindowClickListener{
 		   ImageView image=(ImageView)row.findViewById(R.id.image);
 		   imageLoader.displayImage(myEventImage[position], image, options, animateFirstListener);
 
-  		   
   		   return row;
   		  }
   	}

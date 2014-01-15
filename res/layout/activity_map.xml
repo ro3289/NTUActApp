@@ -51,6 +51,12 @@
 	    android:layout_height="wrap_content" 
 	    android:layout_below="@id/end_date_button"
 	    android:layout_toRightOf="@id/start_date_text"/>
+    <include
+	    android:id="@+id/search"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_alignParentBottom="true"
+	    layout="@layout/search" />
     
     
 </RelativeLayout>

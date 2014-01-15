@@ -2,6 +2,7 @@ package com.example.eventmap;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -20,7 +21,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 
+import com.example.eventmap.FacebookFragment.ListItemAdapter;
 import com.example.util.Account;
 import com.example.util.DBConnector;
 import com.example.util.EventDialog;
@@ -42,6 +45,7 @@ public class MainActivity extends FragmentActivity {
 	private AlertDialog facebookLoginDialog;
 	private static int MY_EVENT_FRAGMENT = 0;
 	private static int HOT_EVENT_FRAGMENT = 1;
+	protected EditText searchText;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -109,13 +113,13 @@ public class MainActivity extends FragmentActivity {
 			}
 		});
         
-        Button pickFriendButton = (Button) findViewById(R.id.pick_friend);
+        /*Button pickFriendButton = (Button) findViewById(R.id.pick_friend);
         pickFriendButton.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
             	startPickFriendsActivity();
             }
-        });
-        
+        });*/
+        searchText = (EditText) findViewById(R.id.searchText);
         // Facebook Login setting
         uiHelper = new UiLifecycleHelper(this, callback);
         uiHelper.onCreate(savedInstanceState);
@@ -449,5 +453,49 @@ public class MainActivity extends FragmentActivity {
         } else {
             pickFriendsWhenSessionOpened = true;
         }
+    }
+    public void search(View view){
+    	// Tracing events
+    	System.out.println("hehehehheheeeeeeeeeee");
+    	
+    	try {
+			if(searchText.getText().toString().equals(""))
+			{
+				System.out.println("thisline");
+			}
+			else
+			{
+    		String myEventData = new DBConnector().execute("SELECT * FROM activity WHERE ActName LIKE '%"+searchText.getText().toString()+"%' OR Content LIKE '%"+searchText.getText().toString()+"%'").get();
+			JSONArray jsonArray = new JSONArray(myEventData);
+			ArrayList<String> myEventNameList 	 = new ArrayList<String>();
+			ArrayList<String> myEventContentList = new ArrayList<String>();
+			ArrayList<String> myEventImageList 	 = new ArrayList<String>();
+			//Account.getInstance().clearEvent();
+			for(int index = 0; index < jsonArray.length(); ++index)
+			{
+				int eventID = jsonArray.getJSONObject(index).getInt("ActID");
+				System.out.println(eventList.get(eventID).name);
+				myEventNameList.add(eventList.get(eventID).name);
+				myEventContentList.add(eventList.get(eventID).content);
+				myEventImageList.add(eventList.get(eventID).image);
+				//Account.getInstance().addMyEvent(eventList.get(eventID));
+			}
+			/*
+			myEventName = myEventNameList.toArray(new String[myEventNameList.size()]);
+			myEventContent = myEventContentList.toArray(new String[myEventContentList.size()]);
+			myEventImage = myEventImageList.toArray(new String[myEventImageList.size()]);
+			myListAdapter = new ListItemAdapter(getActivity(), R.layout.listview_myevent, myEventName);
+			setListAdapter(myListAdapter);*/
+			}
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
 }

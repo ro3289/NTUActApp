@@ -1,8 +1,15 @@
 package com.example.eventmap;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+
+
 
 import android.app.Activity;
 import android.content.Context;
@@ -14,11 +21,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.example.util.Account;
+import com.example.util.DBConnector;
 import com.example.util.EventDialog;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -30,6 +39,7 @@ import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
 
 public class FacebookFragment extends ListFragment {
 
+	
 	private ImageLoader imageLoader = ImageLoader.getInstance();
 	private DisplayImageOptions options;
 	private ListItemAdapter myListAdapter;
@@ -37,6 +47,7 @@ public class FacebookFragment extends ListFragment {
 	private String[] myEventName;
 	private String[] myEventContent;
     private String[] myEventImage;
+
 	
 	public class ListItemAdapter extends ArrayAdapter<String> {
 		
@@ -80,6 +91,7 @@ public class FacebookFragment extends ListFragment {
 		.cacheInMemory()
 		.cacheOnDisc()
 		.build();
+		
 	}
 	
 	@Override
@@ -132,11 +144,14 @@ public class FacebookFragment extends ListFragment {
 		}
 	
 	public void updateEventList(){
-		myEventName		= Account.getInstance().getEventNameStringArray();
+		myEventName		= Account.getInstance().getEventNameStringArray();		
 		myEventContent 	= Account.getInstance().getEventContentStringArray();
 		myEventImage 	= Account.getInstance().getEventImageStringArray();
+		System.out.println(myEventName.length);
 		myListAdapter = new ListItemAdapter(getActivity(), R.layout.listview_myevent, myEventName);
+		System.out.println("hehehehheheeeeeeeeeee");
 		setListAdapter(myListAdapter);
 	}
+	
 	
 }

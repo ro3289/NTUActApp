@@ -477,7 +477,9 @@ public class MainActivity extends FragmentActivity {
         return true;
     }
     
+    
     private void startPickFriendsActivity() {
+
         if (ensureOpenSession()) {
             Intent intent = new Intent(this, PickFriendsActivity.class);
             // Note: The following line is optional, as multi-select behavior is the default for

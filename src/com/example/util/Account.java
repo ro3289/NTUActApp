@@ -14,8 +14,8 @@ public class Account{
 	public static Account INSTANCE = new Account();
 	
 	private MainActivity activity;
+	private String userID;
 	private String username;
-	private int userID;
 	private int myPreference;
 	
 	private ArrayList<Integer> originalSelectedItems = new ArrayList<Integer>();
@@ -25,7 +25,7 @@ public class Account{
 	
 	private ArrayList<EventInfo> myEventList 		 = new ArrayList<EventInfo>();
 
-	public static void updateAccount(MainActivity a, int id, String name, String pwd, int preference)
+	public static void updateAccount(MainActivity a, String id, String name, int preference)
 	{
 		getInstance().activity 		= a;
 		getInstance().userID		= id;
@@ -58,7 +58,6 @@ public class Account{
 			}else{
 				checkedItems[i] = false;
 			}
-			
 		}
 		new AlertDialog.Builder(activity)
 	    // Set the dialog title
@@ -105,6 +104,7 @@ public class Account{
 		myPreference = newPreference;
 		// Update database!!
 		new DBConnector().execute("UPDATE userlist SET Preference = " + myPreference + " WHERE ID = " + userID);
+		activity.updatePreferenceEvent();
 	}
 	/*
 	public void showMyEvent()
@@ -191,8 +191,16 @@ public class Account{
 		myEventList.clear();
 	}
 	
-	public int getUserID(){
+	public String getUserID(){
 		return userID;
+	}
+	
+	public String getUserName(){
+		return username;
+	}
+	
+	public int getMyPreference(){
+		return myPreference;
 	}
 
 }

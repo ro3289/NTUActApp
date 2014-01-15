@@ -4,7 +4,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -13,8 +15,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.v4.app.FragmentActivity;
@@ -23,7 +27,12 @@ import android.support.v4.app.FragmentTabHost;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.example.util.Account;
 import com.example.util.DBConnector;
@@ -44,6 +53,11 @@ import com.facebook.model.GraphUser;
 import com.facebook.widget.FacebookDialog;
 import com.facebook.widget.LoginButton;
 import com.facebook.widget.ProfilePictureView;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.assist.ImageLoadingListener;
+import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
+import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
 
 public class MainActivity extends FragmentActivity {
 
@@ -52,6 +66,7 @@ public class MainActivity extends FragmentActivity {
 	private static int MY_EVENT_FRAGMENT = 0;
 	private static int HOT_EVENT_FRAGMENT = 1;
 	public boolean MY_PREFERENCE = true;
+	
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -99,8 +114,15 @@ public class MainActivity extends FragmentActivity {
         .build());
 
         EventDialog.setUpEventDialog(this);
+        searchText = (EditText) findViewById(R.id.searchText);
 //        this.showLoginDialog();
-
+        options = new DisplayImageOptions.Builder()
+    	.showStubImage(R.drawable.ic_stub)
+    	.showImageForEmptyUri(R.drawable.ic_empty)
+    	.showImageOnFail(R.drawable.ic_error)
+		.cacheInMemory()
+		.cacheOnDisc()
+		.build();
         Button mapActivity = (Button)findViewById(R.id.map_activity);
         mapActivity.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
@@ -520,4 +542,118 @@ public class MainActivity extends FragmentActivity {
         //pendingRequest = false;
         Request.executeBatchAndWait(requests);
     }
+    
+    ///////////////////////////
+    /////////Search////////////
+    ///////////////////////////
+    
+    private String[] myEventName;
+	private String[] myEventContent;
+	private String[] myEventImage;
+	protected EditText searchText;
+	private DisplayImageOptions options;
+	private ImageLoader imageLoader = ImageLoader.getInstance();
+	
+	
+    public void search(View view){
+    	// Tracing events
+    	System.out.println("hehehehheheeeeeeeeeee");
+    	
+    	try {
+			if(searchText.getText().toString().equals(""))
+			{
+				System.out.println("thisline");
+			}
+			else
+			{
+    		String myEventData = new DBConnector().execute("SELECT * FROM activity WHERE Name LIKE '%"+searchText.getText().toString()+"%' OR Content LIKE '%"+searchText.getText().toString()+"%'").get();
+			JSONArray jsonArray = new JSONArray(myEventData);
+			ArrayList<String> myEventNameList 	 = new ArrayList<String>();
+			ArrayList<String> myEventContentList = new ArrayList<String>();
+			ArrayList<String> myEventImageList 	 = new ArrayList<String>();
+			//Account.getInstance().clearEvent();
+			for(int index = 0; index < jsonArray.length(); ++index)
+			{
+				int eventID = jsonArray.getJSONObject(index).getInt("ID");
+				System.out.println(eventList.get(eventID).name);
+				myEventNameList.add(eventList.get(eventID).name);
+				myEventContentList.add(eventList.get(eventID).content);
+				myEventImageList.add(eventList.get(eventID).image);
+				//Account.getInstance().addMyEvent(eventList.get(eventID));
+			}
+			
+			myEventName = myEventNameList.toArray(new String[myEventNameList.size()]);
+			myEventContent = myEventContentList.toArray(new String[myEventContentList.size()]);
+			myEventImage = myEventImageList.toArray(new String[myEventImageList.size()]);
+			showSearchList();
+			/*myListAdapter = new ListItemAdapter(getActivity(), R.layout.listview_myevent, myEventName);
+			setListAdapter(myListAdapter);*/
+			}
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    }
+    private void showSearchList(){
+		//String[] guestsList = eventGuestsNameList.toArray(new String[eventGuestsNameList.size()]);
+		ListItemAdapter myListItemAdapter = new ListItemAdapter(this, R.layout.listview_search, myEventName);
+		new AlertDialog.Builder(this)
+	    // Set the dialog title
+		.setTitle("Search")
+		.setAdapter( myListItemAdapter, null)
+	    // Specify the list array, the items to be selected by default (null for none),
+	    // and the listener through which to receive callbacks when items are selected
+       .show();
+
+	}
+    public class ListItemAdapter extends ArrayAdapter<String> {
+    private ImageLoadingListener animateFirstListener = new AnimateFirstDisplayListener();
+  	  Context myContext;
+  	
+  	  public ListItemAdapter(Context context, int textViewResourceId, String[] objects) {
+  		  super(context, textViewResourceId, objects);
+  		  myContext = context;
+  	  } 
+  		  @Override
+  		  public View getView(int position, View convertView, ViewGroup parent) {
+  		   
+  		   LayoutInflater inflater = (LayoutInflater) myContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+  		   View row = inflater.inflate(R.layout.listview_search, parent, false);
+  		 TextView eventName = (TextView)row.findViewById(R.id.event_name);
+		   eventName.setText(myEventName[position]);
+		   
+		   TextView eventContent = (TextView)row.findViewById(R.id.event_content);
+		   eventContent.setText(myEventContent[position]);
+		   
+		   ImageView image=(ImageView)row.findViewById(R.id.image);
+		   imageLoader.displayImage(myEventImage[position], image, options, animateFirstListener);
+
+  		   
+  		   return row;
+  		  }
+  	}
+    private static class AnimateFirstDisplayListener extends SimpleImageLoadingListener {
+
+		static final List<String> displayedImages = Collections.synchronizedList(new LinkedList<String>());
+
+		@Override
+		public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
+			if (loadedImage != null) {
+				ImageView imageView = (ImageView) view;
+				boolean firstDisplay = !displayedImages.contains(imageUri);
+				if (firstDisplay) {
+					FadeInBitmapDisplayer.animate(imageView, 500);
+				} else {
+					imageView.setImageBitmap(loadedImage);
+				}
+				displayedImages.add(imageUri);
+			}
+		}
+	}
 }

@@ -41,8 +41,13 @@
 		    android:id="@+id/get_info"
 		    android:layout_height="wrap_content"
 		    android:layout_width="wrap_content"
-		    android:text="Info Dialog Test"
-		    android:layout_toRightOf="@id/map_activity" />
+		    android:text="Info Dialog Test"  />
+	     
+	     <Button
+		    android:id="@+id/pick_friend"
+		    android:layout_height="wrap_content"
+		    android:layout_width="wrap_content"
+		    android:text="Pick Friend"  />
 
 
 </LinearLayout>

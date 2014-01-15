@@ -42,6 +42,7 @@ import com.facebook.widget.LoginButton;
 public class MainActivity extends FragmentActivity {
 
 	public static HashMap<Integer,EventInfo> eventList = new HashMap<Integer, EventInfo>();
+	private AlertDialog facebookLoginDialog;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -104,6 +105,12 @@ public class MainActivity extends FragmentActivity {
 			}
 		});
         
+        Button pickFriendButton = (Button) findViewById(R.id.pick_friend);
+        mapActivity.setOnClickListener(new Button.OnClickListener() {
+            public void onClick(View v) {
+            }
+        });
+        
         // Facebook Login setting
         uiHelper = new UiLifecycleHelper(this, callback);
         uiHelper.onCreate(savedInstanceState);
@@ -113,8 +120,8 @@ public class MainActivity extends FragmentActivity {
             pendingAction = PendingAction.valueOf(name);
         }
         
-        showFacebookLoginDialog();
-        
+        setUpFacebookLoginDialog();
+        facebookLoginDialog.show();
     }
    
     
@@ -327,6 +334,8 @@ public class MainActivity extends FragmentActivity {
     private GraphUser user;
     private GraphPlace place;
     private List<GraphUser> tags;
+	private TextView greeting;
+	private boolean pickFriendsWhenSessionOpened;
 
     private enum PendingAction {
         NONE,
@@ -416,7 +425,7 @@ public class MainActivity extends FragmentActivity {
     }
     
     
-    private void showFacebookLoginDialog() {
+    private void setUpFacebookLoginDialog() {
     	LayoutInflater layoutInflater = this.getLayoutInflater();
 		final View inflater = layoutInflater.inflate(R.layout.facebook_layout, null) ;
 		loginButton = (LoginButton) inflater.findViewById(R.id.login_button);
@@ -426,27 +435,13 @@ public class MainActivity extends FragmentActivity {
                 MainActivity.this.user = user;
                 // It's possible that we were waiting for this.user to be populated in order to post a
                 // status update.
+                checkLogin();
                 handlePendingAction();
-                if(MainActivity.this.user != null){
-                	
-                }
             }
 	    });
-    	AlertDialog loginDialog = new AlertDialog.Builder(this)
+    	facebookLoginDialog = new AlertDialog.Builder(this)
     	.setTitle("NTUAct")
     	.setView(inflater)
-        .setPositiveButton(R.string.log_in, new DialogInterface.OnClickListener() {
-        	@Override
-            public void onClick(DialogInterface dialog, int whichButton) {
-        		if(user != null){
-        			updateUserInfo(user.getUsername());
-        			getEventInfo();
-        			getUserEvent();
-                }else {
-                	showFacebookLoginDialog();
-                }
-            }
-        })
         .setNegativeButton(R.string.exit, new DialogInterface.OnClickListener() {
         	@Override
             public void onClick(DialogInterface dialog, int whichButton) {
@@ -454,8 +449,21 @@ public class MainActivity extends FragmentActivity {
             }
         })
         .create();
-		loginDialog.setCanceledOnTouchOutside(false);
-		loginDialog.show();
+    	facebookLoginDialog.setCanceledOnTouchOutside(false);
+    }
+    
+    private void checkLogin(){
+    	Session session = Session.getActiveSession();
+        boolean enableButtons = (session != null && session.isOpened());
+        
+        if (enableButtons && user != null) {
+        	updateUserInfo(user.getName());
+        	getEventInfo();
+        	getUserEvent();
+        	facebookLoginDialog.dismiss();
+        } else {
+        	facebookLoginDialog.show();
+        }
     }
     
     public void updateUserInfo(String name){

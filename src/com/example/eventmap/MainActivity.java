@@ -106,8 +106,9 @@ public class MainActivity extends FragmentActivity {
 		});
         
         Button pickFriendButton = (Button) findViewById(R.id.pick_friend);
-        mapActivity.setOnClickListener(new Button.OnClickListener() {
+        pickFriendButton.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
+            	startPickFriendsActivity();
             }
         });
         
@@ -316,6 +317,8 @@ public class MainActivity extends FragmentActivity {
 	    }else if (requestCode == 1){
 	    	AppleFragment eventFragment = (AppleFragment)getSupportFragmentManager().findFragmentByTag("Apple");
 	        if(eventFragment != null) eventFragment.updateHotEvent();
+	    }else if (requestCode == PICK_FRIENDS_ACTIVITY){
+	    	
 	    }
 	    uiHelper.onActivityResult(requestCode, resultCode, data, dialogCallback);
 	}
@@ -334,8 +337,8 @@ public class MainActivity extends FragmentActivity {
     private GraphUser user;
     private GraphPlace place;
     private List<GraphUser> tags;
-	private TextView greeting;
 	private boolean pickFriendsWhenSessionOpened;
+	private static final int PICK_FRIENDS_ACTIVITY = 2;
 
     private enum PendingAction {
         NONE,
@@ -453,10 +456,7 @@ public class MainActivity extends FragmentActivity {
     }
     
     private void checkLogin(){
-    	Session session = Session.getActiveSession();
-        boolean enableButtons = (session != null && session.isOpened());
-        
-        if (enableButtons && user != null) {
+        if ( ensureOpenSession() && user != null) {
         	updateUserInfo(user.getName());
         	getEventInfo();
         	getUserEvent();
@@ -517,5 +517,33 @@ public class MainActivity extends FragmentActivity {
 			e.printStackTrace();
 		}
 		updateUserInfo(name);
+    }
+    
+    private boolean ensureOpenSession() {
+        if (Session.getActiveSession() == null || !Session.getActiveSession().isOpened()) {
+            Session.openActiveSession(this, true, new Session.StatusCallback() {
+                @Override
+                public void call(Session session, SessionState state, Exception exception) {
+                    onSessionStateChange(session, state, exception);
+                }
+            });
+            return false;
+        }
+        return true;
+    }
+    
+    private void startPickFriendsActivity() {
+        if (ensureOpenSession()) {
+            Intent intent = new Intent(this, PickFriendsActivity.class);
+            // Note: The following line is optional, as multi-select behavior is the default for
+            // FriendPickerFragment. It is here to demonstrate how parameters could be passed to the
+            // friend picker if single-select functionality was desired, or if a different user ID was
+            // desired (for instance, to see friends of a friend).
+            
+            PickFriendsActivity.populateParameters(intent, user.getId(), true, true);
+            startActivityForResult(intent, PICK_FRIENDS_ACTIVITY);
+        } else {
+            pickFriendsWhenSessionOpened = true;
+        }
     }
 }

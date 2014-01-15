@@ -3,25 +3,29 @@ package com.example.util;
 import java.util.Calendar;
 import java.util.Date;
 
+import com.google.android.gms.maps.model.LatLng;
+
 public class EventInfo {
 	
 	public int 		id;
 	public String  	name;
 	public String  	snippet;
 	public String  	location;
+	public LatLng	point;
 	public String 	url;
 	public String 	image;
 	public String  	content;
 	private Calendar cal;
 	public int 	tagValue;
 	
-	public EventInfo(int ID, String Name, String Location, String u, String i, String Content, Date date, int tag)
+	public EventInfo(int i, String n, String l, LatLng p, String u, String im, String Content, Date date, int tag)
 	{
-		id = ID;
-		name = Name;
-		location = Location;
+		id = i;
+		name = n;
+		location = l;
+		point = p;
 		url = u;
-		image = i;
+		image = im;
 		content = Content;
 		cal = Calendar.getInstance();
 		cal.setTime(date);

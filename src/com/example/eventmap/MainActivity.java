@@ -22,7 +22,6 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTabHost;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -32,6 +31,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.example.util.Account;
@@ -53,6 +53,7 @@ import com.facebook.model.GraphUser;
 import com.facebook.widget.FacebookDialog;
 import com.facebook.widget.LoginButton;
 import com.facebook.widget.ProfilePictureView;
+import com.google.android.gms.maps.model.LatLng;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.ImageLoadingListener;
@@ -192,8 +193,10 @@ public class MainActivity extends FragmentActivity {
 				String content 	= jsonArray.getJSONObject(index).getString("Content");
 				String date 	= jsonArray.getJSONObject(index).getString("Time");
 				int    tag 	    = jsonArray.getJSONObject(index).getInt("Tag");
+				double lat 		= jsonArray.getJSONObject(index).getDouble("Latitude");
+				double lng 		= jsonArray.getJSONObject(index).getDouble("Longitude");
 				try {
-					eventList.put(ID, new EventInfo(ID, name, location, url, image, content, sdf.parse(date), tag));
+					eventList.put(ID, new EventInfo(ID, name, location, new LatLng(lat,lng) ,url, image, content, sdf.parse(date), tag));
 				} catch (ParseException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -289,13 +292,10 @@ public class MainActivity extends FragmentActivity {
 	    uiHelper.onActivityResult(requestCode, resultCode, data, dialogCallback);
 	}
 	
-	/* 
-	 * 
-	 * 
-	 * Facebook activity
-	 * 
-	 * 
-	 */
+	///////////////////////////
+	//////////Facebook/////////
+	///////////////////////////
+	
     private final String PENDING_ACTION_BUNDLE_KEY = "com.facebook.samples.hellofacebook:PendingAction";
 
     private LoginButton loginButton;
@@ -392,7 +392,6 @@ public class MainActivity extends FragmentActivity {
                 break;
         }
     }
-    
     
     private void setUpFacebookLoginDialog() {
     	LayoutInflater layoutInflater = this.getLayoutInflater();
@@ -551,43 +550,34 @@ public class MainActivity extends FragmentActivity {
 	private String[] myEventContent;
 	private String[] myEventImage;
 	protected EditText searchText;
+	private ArrayList<Integer> searchEventIdList = new ArrayList<Integer>();
 	private DisplayImageOptions options;
 	private ImageLoader imageLoader = ImageLoader.getInstance();
 	
 	
-    public void search(View view){
-    	// Tracing events
-    	System.out.println("hehehehheheeeeeeeeeee");
-    	
+    public void searchEvent(View view){
+    	searchEventIdList.clear();
     	try {
-			if(searchText.getText().toString().equals(""))
-			{
+			if(searchText.getText().toString().equals("")) {
 				System.out.println("thisline");
-			}
-			else
-			{
-    		String myEventData = new DBConnector().execute("SELECT * FROM activity WHERE Name LIKE '%"+searchText.getText().toString()+"%' OR Content LIKE '%"+searchText.getText().toString()+"%'").get();
-			JSONArray jsonArray = new JSONArray(myEventData);
-			ArrayList<String> myEventNameList 	 = new ArrayList<String>();
-			ArrayList<String> myEventContentList = new ArrayList<String>();
-			ArrayList<String> myEventImageList 	 = new ArrayList<String>();
-			//Account.getInstance().clearEvent();
-			for(int index = 0; index < jsonArray.length(); ++index)
-			{
-				int eventID = jsonArray.getJSONObject(index).getInt("ID");
-				System.out.println(eventList.get(eventID).name);
-				myEventNameList.add(eventList.get(eventID).name);
-				myEventContentList.add(eventList.get(eventID).content);
-				myEventImageList.add(eventList.get(eventID).image);
-				//Account.getInstance().addMyEvent(eventList.get(eventID));
-			}
+			} else {
+	    		String myEventData = new DBConnector().execute("SELECT * FROM activity WHERE Name LIKE '%"+searchText.getText().toString()+"%' OR Content LIKE '%"+searchText.getText().toString()+"%'").get();
+				JSONArray jsonArray = new JSONArray(myEventData);
+				ArrayList<String> myEventNameList 	 = new ArrayList<String>();
+				ArrayList<String> myEventContentList = new ArrayList<String>();
+				ArrayList<String> myEventImageList 	 = new ArrayList<String>();
+				for(int index = 0; index < jsonArray.length(); ++index) {
+					int eventID = jsonArray.getJSONObject(index).getInt("ID");
+					System.out.println(eventList.get(eventID).name);
+					myEventNameList.add(eventList.get(eventID).name);
+					myEventContentList.add(eventList.get(eventID).content);
+					myEventImageList.add(eventList.get(eventID).image);
+				}
 			
-			myEventName = myEventNameList.toArray(new String[myEventNameList.size()]);
-			myEventContent = myEventContentList.toArray(new String[myEventContentList.size()]);
-			myEventImage = myEventImageList.toArray(new String[myEventImageList.size()]);
-			showSearchList();
-			/*myListAdapter = new ListItemAdapter(getActivity(), R.layout.listview_myevent, myEventName);
-			setListAdapter(myListAdapter);*/
+				myEventName = myEventNameList.toArray(new String[myEventNameList.size()]);
+				myEventContent = myEventContentList.toArray(new String[myEventContentList.size()]);
+				myEventImage = myEventImageList.toArray(new String[myEventImageList.size()]);
+				showSearchList();
 			}
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
@@ -601,12 +591,16 @@ public class MainActivity extends FragmentActivity {
 		}
     }
     private void showSearchList(){
-		//String[] guestsList = eventGuestsNameList.toArray(new String[eventGuestsNameList.size()]);
 		ListItemAdapter myListItemAdapter = new ListItemAdapter(this, R.layout.listview_search, myEventName);
 		new AlertDialog.Builder(this)
 	    // Set the dialog title
 		.setTitle("Search")
-		.setAdapter( myListItemAdapter, null)
+		.setAdapter( myListItemAdapter, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				EventDialog.getInstance().showEventInfoDialog(eventList.get(searchEventIdList.get(which)), null);
+			}
+		})
 	    // Specify the list array, the items to be selected by default (null for none),
 	    // and the listener through which to receive callbacks when items are selected
        .show();
@@ -633,10 +627,12 @@ public class MainActivity extends FragmentActivity {
 		   
 		   ImageView image=(ImageView)row.findViewById(R.id.image);
 		   imageLoader.displayImage(myEventImage[position], image, options, animateFirstListener);
-
-  		   
+		   
   		   return row;
   		  }
+  		  
+  		
+  		  
   	}
     private static class AnimateFirstDisplayListener extends SimpleImageLoadingListener {
 

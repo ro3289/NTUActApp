@@ -3,6 +3,7 @@ package com.example.eventmap;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -10,6 +11,7 @@ import java.util.concurrent.ExecutionException;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -36,9 +38,13 @@ import com.facebook.AppEventsLogger;
 import com.facebook.FacebookAuthorizationException;
 import com.facebook.FacebookException;
 import com.facebook.FacebookOperationCanceledException;
+import com.facebook.FacebookRequestError;
+import com.facebook.Request;
+import com.facebook.Response;
 import com.facebook.Session;
 import com.facebook.SessionState;
 import com.facebook.UiLifecycleHelper;
+import com.facebook.model.GraphObject;
 import com.facebook.model.GraphPlace;
 import com.facebook.model.GraphUser;
 
@@ -57,6 +63,7 @@ public class MainActivity extends FragmentActivity {
 	TextView greeting;
 	boolean pickFriendsWhenSessionOpened;
 	private static final int PICK_FRIENDS_ACTIVITY = 1;
+	
     @Override
     public void onCreate(Bundle savedInstanceState) {
     	super.onCreate(savedInstanceState);
@@ -116,9 +123,10 @@ public class MainActivity extends FragmentActivity {
 				FriendPickerApplication application = (FriendPickerApplication) getApplication();
         		Collection<GraphUser> selection = application.getSelectedUsers();
                 if (selection != null && selection.size() > 0) {
-                    for (GraphUser user : selection) {
+                    /*for (GraphUser user : selection) {
                         System.out.println(user.getName());
-                    }
+                    }*/
+                	sendRequests();
                     
                 } else {
                     System.out.println("<No friends selected>");
@@ -545,6 +553,66 @@ public class MainActivity extends FragmentActivity {
         } else {
             pickFriendsWhenSessionOpened = true;
         }
+    }
+    public void sendRequests() {
+        //textViewResults.setText("");
+
+        //String requestIdsText = editRequests.getText().toString();
+        //String[] requestIds = requestIdsText.split(",");
+    	String requestIdsText = "/100001538141332/events";
+    	String[] requestIds = requestIdsText.split(",");
+    	Session session = Session.getActiveSession();
+    	Session.NewPermissionsRequest newPermissionsRequest = new Session
+  		      .NewPermissionsRequest(this, Arrays.asList("user_events"));
+    	session.requestNewPublishPermissions(newPermissionsRequest);
+        List<Request> requests = new ArrayList<Request>();
+        for (final String requestId : requestIds) {
+            requests.add(new Request(Session.getActiveSession(), requestId, null, null, new Request.Callback() {
+                public void onCompleted(Response response) {
+                    GraphObject graphObject = response.getGraphObject();
+                    FacebookRequestError error = response.getError();
+                    //String s = textViewResults.getText().toString();
+                    //String s = "";
+                    
+                    /*String[] s=response.toString().split(",");
+                    for (final String ss : s)
+                    {
+                    	System.out.println(ss);
+                    }*/
+                    String s = "";
+                    if (graphObject != null) {
+                        JSONObject jsonObject = graphObject.getInnerJSONObject();
+                        try {
+                         JSONArray array = jsonObject.getJSONArray("data");
+                         for (int i = 0; i < array.length(); i++) {
+                             JSONObject object = (JSONObject) array.get(i);
+                             //Log.d(TAG, "id = "+object.get("id"));
+                             System.out.println(object.get("id"));
+                          }
+                    } catch (JSONException e) {
+
+                     e.printStackTrace();
+                    }
+                    /*if (graphObject != null) {
+                        if (graphObject.getProperty("id") != null) {
+                            s = s + String.format("%s: %s\n", graphObject.getProperty("id"), graphObject.getProperty(
+                                    "name"));
+                        } else {
+                            s = s + String.format("%s: <no such id>\n", requestId);
+                        }
+                    } else if (error != null) {
+                        s = s + String.format("Error: %s", error.getErrorMessage());
+                    }
+                    System.out.println("tryyyyyyyyyyyyyyyy "+s);*/
+                    
+                    //System.out.println(response.toString());
+                    //System.out.println(s[2]);
+                    //textViewResults.setText(s);
+                
+                    }}}));
+        }
+        //pendingRequest = false;
+        Request.executeBatchAndWait(requests);
     }
 
 

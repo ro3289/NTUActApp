@@ -20,9 +20,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.util.Account;
 import com.example.util.DBConnector;
@@ -42,6 +39,9 @@ import com.facebook.widget.LoginButton;
 public class MainActivity extends FragmentActivity {
 
 	public static HashMap<Integer,EventInfo> eventList = new HashMap<Integer, EventInfo>();
+	private AlertDialog facebookLoginDialog;
+	private static int MY_EVENT_FRAGMENT = 0;
+	private static int HOT_EVENT_FRAGMENT = 1;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -51,24 +51,29 @@ public class MainActivity extends FragmentActivity {
 		FragmentTabHost tabHost = (FragmentTabHost)findViewById(android.R.id.tabhost);
 		tabHost.setup(this, getSupportFragmentManager(), R.id.realtabcontent);
 		//1
-		tabHost.addTab(tabHost.newTabSpec("Apple")
-			   				  .setIndicator("Apple"), 
+		tabHost.addTab(tabHost.newTabSpec("熱門活動")
+			   				  .setIndicator("熱門活動"), 
    					  AppleFragment.class, 
    					  null);
 	    //2
-		tabHost.addTab(tabHost.newTabSpec("Google")
-				   			  .setIndicator("Google"), 
+		tabHost.addTab(tabHost.newTabSpec("最新活動")
+				   			  .setIndicator("最新活動"), 
 					  GoogleFragment.class, 
 					  null);
-	    //3
-		tabHost.addTab(tabHost.newTabSpec("Facebook")
-				   			  .setIndicator("Facebook"), 
+		//3
+		tabHost.addTab(tabHost.newTabSpec("偏好瀏覽")
+					   				  .setIndicator("偏好瀏覽"), 
+							  TwitterFragment.class, 
+							  null);
+	    //4
+		tabHost.addTab(tabHost.newTabSpec("我的活動")
+				   			  .setIndicator("我的活動"), 
 					  FacebookFragment.class, 
 				      null);
-	    //4
-		tabHost.addTab(tabHost.newTabSpec("Twitter")
-			   				  .setIndicator("Twitter"), 
-					  TwitterFragment.class, 
+		//5
+		tabHost.addTab(tabHost.newTabSpec("常用連結")
+			   				  .setIndicator("常用連結"), 
+					  	ConnectFragment.class, 
 					  null);
         
         StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()  
@@ -90,7 +95,7 @@ public class MainActivity extends FragmentActivity {
         mapActivity.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
                 Intent myIntent=new Intent(v.getContext(), MapActivity.class);
-                startActivityForResult(myIntent,0);
+                startActivityForResult(myIntent, MY_EVENT_FRAGMENT);
             }
         });
         
@@ -104,6 +109,13 @@ public class MainActivity extends FragmentActivity {
 			}
 		});
         
+        Button pickFriendButton = (Button) findViewById(R.id.pick_friend);
+        pickFriendButton.setOnClickListener(new Button.OnClickListener() {
+            public void onClick(View v) {
+            	startPickFriendsActivity();
+            }
+        });
+        
         // Facebook Login setting
         uiHelper = new UiLifecycleHelper(this, callback);
         uiHelper.onCreate(savedInstanceState);
@@ -113,41 +125,10 @@ public class MainActivity extends FragmentActivity {
             pendingAction = PendingAction.valueOf(name);
         }
         
-        showFacebookLoginDialog();
-        
+        setUpFacebookLoginDialog();
+        facebookLoginDialog.show();
     }
    
-    
-    private boolean getUserInfo(String name, String pwd) {
-    	// User information and preference
-    	try {
-			String accountData = new DBConnector()
-			.execute("SELECT * FROM userlist WHERE Username =" + "'" + name + "'"
-					+ "AND Password =" + "'" + pwd + "'")
-			.get();
-			JSONArray jsonArray = new JSONArray(accountData);
-			if(jsonArray.length() != 0)
-			{
-				int    id 	      = jsonArray.getJSONObject(0).getInt("ID");
-				String username   = jsonArray.getJSONObject(0).getString("Username");
-				String password   = jsonArray.getJSONObject(0).getString("Password");
-				int    preference = jsonArray.getJSONObject(0).getInt("Preference");
-				Account.updateAccount(this, id, username, password, preference);
-				return true;
-			}
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-    	return false;
-	}
-
     private void getEventInfo()
     {
     	try {
@@ -187,7 +168,7 @@ public class MainActivity extends FragmentActivity {
     private void getUserEvent(){
     	// Tracing events
     	try {
-			String myEventData = new DBConnector().execute("SELECT * FROM user_act WHERE UserID =" + Account.getInstance().getUserID()).get();
+			String myEventData = new DBConnector().execute("SELECT * FROM user_act WHERE UserID ='" + Account.getInstance().getUserID() + "'").get();
 			JSONArray jsonArray = new JSONArray(myEventData);
 			Account.getInstance().clearEvent();
 			for(int index = 0; index < jsonArray.length(); ++index)
@@ -206,71 +187,8 @@ public class MainActivity extends FragmentActivity {
 			e.printStackTrace();
 		}
     }
-    
-    private void showLoginDialog(){
-    	LayoutInflater layoutInflater = this.getLayoutInflater();
-		final View inflater = layoutInflater.inflate(R.layout.dialog_login, null) ;
-		((TextView) inflater.findViewById(R.id.username_text)).setText("使用者名稱");
-		((TextView) inflater.findViewById(R.id.password_text)).setText("使用者密碼");
-    	AlertDialog loginDialog = new AlertDialog.Builder(this)
-    	.setTitle("NTUAct")
-    	.setView(inflater)
-        .setPositiveButton(R.string.log_in, new DialogInterface.OnClickListener() {
-        	@Override
-            public void onClick(DialogInterface dialog, int whichButton) {
-				String username = ((EditText) inflater.findViewById(R.id.username_edit)).getText().toString();
-				String password = ((EditText) inflater.findViewById(R.id.password_edit)).getText().toString();
-        		if(getUserInfo(username, password)){
-        			getEventInfo();
-        			getUserEvent();
-        		}else{
-            		Toast.makeText(getApplicationContext(), "請重新輸入", Toast.LENGTH_SHORT).show();
-            		showLoginDialog();
-        		}
-            }
-        })
-        .setNeutralButton(R.string.sign_up, new DialogInterface.OnClickListener(){
-			@Override
-			public void onClick(DialogInterface dialog, int whichButton) {
-				String username = ((EditText) inflater.findViewById(R.id.username_edit)).getText().toString();
-				String password = ((EditText) inflater.findViewById(R.id.password_edit)).getText().toString();
-				if(!checkAccountExsistence(username)){
-					registerAccount(username, password);
-					getEventInfo();
-					getUserInfo(username, password);
-				}else{
-					Toast.makeText(getApplicationContext(), "名稱已經有人使用", Toast.LENGTH_SHORT).show();
-					showLoginDialog();
-				}
-			}
-        })
-        .setNegativeButton(R.string.exit, new DialogInterface.OnClickListener() {
-        	@Override
-            public void onClick(DialogInterface dialog, int whichButton) {
-            	System.exit(0);
-            }
-        })
-        .create();
-		loginDialog.setCanceledOnTouchOutside(false);
-		loginDialog.show();
-    }
-    
-	public String getAppleData(){
-		return "Apple 123";
-	}
 
-	public String getGoogleData(){
-		return "Google 456";
-	}
-	
-	public String getFacebookData(){
-		return "Facebook 789";
-	}
-	
-	public String getTwitterData(){
-		return "Twitter abc";
-	}
-	
+    
 	public boolean checkAccountExsistence(String name){
 		try {
 			String result = new DBConnector().execute("SELECT Username FROM userlist WHERE Username = " + "'" + name + "'").get();
@@ -300,15 +218,16 @@ public class MainActivity extends FragmentActivity {
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 	    // Check which request we're responding to
-	    if (requestCode == 0) {
-	        // Make sure the request was successful
+	    if (requestCode == MY_EVENT_FRAGMENT) {
 	    	EventDialog.setUpEventDialog(this);
 	        getUserEvent();
-	        FacebookFragment eventFragment = (FacebookFragment)getSupportFragmentManager().findFragmentByTag("Facebook");
+	        FacebookFragment eventFragment = (FacebookFragment)getSupportFragmentManager().findFragmentByTag("我的活動");
 	        if(eventFragment != null) eventFragment.updateEventList();
-	    }else if (requestCode == 1){
-	    	AppleFragment eventFragment = (AppleFragment)getSupportFragmentManager().findFragmentByTag("Apple");
+	    }else if (requestCode == HOT_EVENT_FRAGMENT){
+	    	AppleFragment eventFragment = (AppleFragment)getSupportFragmentManager().findFragmentByTag("熱門活動");
 	        if(eventFragment != null) eventFragment.updateHotEvent();
+	    }else if (requestCode == PICK_FRIENDS_ACTIVITY){
+	    	
 	    }
 	    uiHelper.onActivityResult(requestCode, resultCode, data, dialogCallback);
 	}
@@ -327,6 +246,8 @@ public class MainActivity extends FragmentActivity {
     private GraphUser user;
     private GraphPlace place;
     private List<GraphUser> tags;
+	private boolean pickFriendsWhenSessionOpened;
+	private static final int PICK_FRIENDS_ACTIVITY = 2;
 
     private enum PendingAction {
         NONE,
@@ -362,9 +283,8 @@ public class MainActivity extends FragmentActivity {
         // Call the 'activateApp' method to log an app event for use in analytics and advertising reporting.  Do so in
         // the onResume methods of the primary Activities that an app may be launched into.
         AppEventsLogger.activateApp(this);
-
     }
-
+    
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -416,7 +336,7 @@ public class MainActivity extends FragmentActivity {
     }
     
     
-    private void showFacebookLoginDialog() {
+    private void setUpFacebookLoginDialog() {
     	LayoutInflater layoutInflater = this.getLayoutInflater();
 		final View inflater = layoutInflater.inflate(R.layout.facebook_layout, null) ;
 		loginButton = (LoginButton) inflater.findViewById(R.id.login_button);
@@ -426,27 +346,13 @@ public class MainActivity extends FragmentActivity {
                 MainActivity.this.user = user;
                 // It's possible that we were waiting for this.user to be populated in order to post a
                 // status update.
+                checkLogin();
                 handlePendingAction();
-                if(MainActivity.this.user != null){
-                	
-                }
             }
 	    });
-    	AlertDialog loginDialog = new AlertDialog.Builder(this)
+    	facebookLoginDialog = new AlertDialog.Builder(this)
     	.setTitle("NTUAct")
     	.setView(inflater)
-        .setPositiveButton(R.string.log_in, new DialogInterface.OnClickListener() {
-        	@Override
-            public void onClick(DialogInterface dialog, int whichButton) {
-        		if(user != null){
-        			updateUserInfo(user.getUsername());
-        			getEventInfo();
-        			getUserEvent();
-                }else {
-                	showFacebookLoginDialog();
-                }
-            }
-        })
         .setNegativeButton(R.string.exit, new DialogInterface.OnClickListener() {
         	@Override
             public void onClick(DialogInterface dialog, int whichButton) {
@@ -454,24 +360,31 @@ public class MainActivity extends FragmentActivity {
             }
         })
         .create();
-		loginDialog.setCanceledOnTouchOutside(false);
-		loginDialog.show();
+    	facebookLoginDialog.setCanceledOnTouchOutside(false);
     }
     
-    public void updateUserInfo(String name){
+    private void checkLogin(){
+        if ( ensureOpenSession() && user != null) {
+        	updateUserInfo(user.getName(), user.getId());
+        	getEventInfo();
+        	getUserEvent();
+        	facebookLoginDialog.dismiss();
+        } else {
+        	facebookLoginDialog.show();
+        }
+    }
+    
+    public void updateUserInfo(String name, String id){
     	// User information and preference
     	try {
-			String accountData = new DBConnector()
-			.execute("SELECT * FROM userlist WHERE Username =" + "'" + name + "'")
-			.get();
+			String accountData = new DBConnector().execute("SELECT * FROM userlist WHERE ID =" + "'" + id + "'").get();
 			JSONArray jsonArray = new JSONArray(accountData);
 			if(jsonArray.length() != 0)
 			{
-				int    id 	      = jsonArray.getJSONObject(0).getInt("ID");
+				String userID 	  = jsonArray.getJSONObject(0).getString("ID");
 				String username   = jsonArray.getJSONObject(0).getString("Username");
-				String password   = jsonArray.getJSONObject(0).getString("Password");
 				int    preference = jsonArray.getJSONObject(0).getInt("Preference");
-				Account.updateAccount(this, id, username, password, preference);
+				Account.updateAccount(this, userID, username, preference);
 				return;
 			}
 		} catch (InterruptedException e) {
@@ -485,17 +398,16 @@ public class MainActivity extends FragmentActivity {
 			e.printStackTrace();
 		}
     	// Create new account if not
-		new DBConnector().execute("INSERT INTO userlist (Username) VALUES ('" + name + "')");
+		new DBConnector().execute("INSERT INTO userlist (Username, ID) VALUES ('" + name + "','" + id + "')");
 		try {
-			String newAccountData = new DBConnector().execute("SELECT * FROM userlist WHERE Username =" + "'" + name + "'").get();
+			String newAccountData = new DBConnector().execute("SELECT * FROM userlist WHERE ID =" + "'" + id + "'").get();
 			JSONArray newJsonArray = new JSONArray(newAccountData);
 			if(newJsonArray.length() != 0)
 			{
-				int    id 	      = newJsonArray.getJSONObject(0).getInt("ID");
+				String userID     = newJsonArray.getJSONObject(0).getString("ID");
 				String username   = newJsonArray.getJSONObject(0).getString("Username");
-				String password   = newJsonArray.getJSONObject(0).getString("Password");
 				int    preference = newJsonArray.getJSONObject(0).getInt("Preference");
-				Account.updateAccount(this, id, username, password, preference);
+				Account.updateAccount(this, userID, username, preference);
 				return;
 			}
 		} catch (InterruptedException e) {
@@ -508,6 +420,34 @@ public class MainActivity extends FragmentActivity {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		updateUserInfo(name);
+		updateUserInfo(name, id);
+    }
+    
+    private boolean ensureOpenSession() {
+        if (Session.getActiveSession() == null || !Session.getActiveSession().isOpened()) {
+            Session.openActiveSession(this, true, new Session.StatusCallback() {
+                @Override
+                public void call(Session session, SessionState state, Exception exception) {
+                    onSessionStateChange(session, state, exception);
+                }
+            });
+            return false;
+        }
+        return true;
+    }
+    
+    private void startPickFriendsActivity() {
+        if (ensureOpenSession()) {
+            Intent intent = new Intent(this, PickFriendsActivity.class);
+            // Note: The following line is optional, as multi-select behavior is the default for
+            // FriendPickerFragment. It is here to demonstrate how parameters could be passed to the
+            // friend picker if single-select functionality was desired, or if a different user ID was
+            // desired (for instance, to see friends of a friend).
+            
+            PickFriendsActivity.populateParameters(intent, user.getId(), true, true);
+            startActivityForResult(intent, PICK_FRIENDS_ACTIVITY);
+        } else {
+            pickFriendsWhenSessionOpened = true;
+        }
     }
 }

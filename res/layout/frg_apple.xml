@@ -3,11 +3,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
-   <GridView
+   	<GridView
             android:id="@+id/gridView1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" >
-
-	    </GridView>
+	</GridView>
 
 </RelativeLayout>

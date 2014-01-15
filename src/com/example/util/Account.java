@@ -14,8 +14,8 @@ public class Account{
 	public static Account INSTANCE = new Account();
 	
 	private MainActivity activity;
+	private String userID;
 	private String username;
-	private int userID;
 	private int myPreference;
 	
 	private ArrayList<Integer> originalSelectedItems = new ArrayList<Integer>();
@@ -25,7 +25,7 @@ public class Account{
 	
 	private ArrayList<EventInfo> myEventList 		 = new ArrayList<EventInfo>();
 
-	public static void updateAccount(MainActivity a, int id, String name, String pwd, int preference)
+	public static void updateAccount(MainActivity a, String id, String name, int preference)
 	{
 		getInstance().activity 		= a;
 		getInstance().userID		= id;
@@ -191,8 +191,12 @@ public class Account{
 		myEventList.clear();
 	}
 	
-	public int getUserID(){
+	public String getUserID(){
 		return userID;
+	}
+	
+	public int getMyPreference(){
+		return myPreference;
 	}
 
 }

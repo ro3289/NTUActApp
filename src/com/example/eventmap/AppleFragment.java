@@ -188,19 +188,7 @@ public class AppleFragment extends Fragment {
 			}
 		}
 	}
-    /*
-    public String[] imageSource = new String[] {
-		// 大圖片們
-		"http://140.112.18.223/activity2.jpg",
-		"http://140.112.18.223/activity3.jpg",
-		"http://140.112.18.223/activity1.jpg",
-		"http://140.112.18.223/activity4.jpg",
-		"http://140.112.18.223/activity5.gif",
-		"http://140.112.18.223/activity6.jpg",
-		"http://140.112.18.223/activity6.jpg",
-		// 小圖片們
-	};
-    */
+	
     public void updateHotEvent(){
     	try {
 			String result = new DBConnector().execute("SELECT ID, Name, ImageUrl FROM activity ORDER BY Follower DESC").get();

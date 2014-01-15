@@ -62,7 +62,6 @@ public class PickFriendsActivity extends FragmentActivity {
                 FriendPickerApplication application = (FriendPickerApplication) getApplication();
                 application.setSelectedUsers(friendPickerFragment.getSelection());
                 Collection<GraphUser> selection = application.getSelectedUsers();
-                System.out.println("hhhhhhhhhhhhhhhhhhhhhhhhh"+selection.size());
                 setResult(RESULT_OK, null);
                 finish();
             }

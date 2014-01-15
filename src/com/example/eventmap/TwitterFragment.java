@@ -40,7 +40,7 @@ import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 
-
+//my preference
 public class TwitterFragment extends Fragment {
 
 	private ImageLoader imageLoader = ImageLoader.getInstance();

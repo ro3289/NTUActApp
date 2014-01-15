@@ -51,7 +51,7 @@ public class FacebookFragment extends ListFragment {
 		  public View getView(int position, View convertView, ViewGroup parent) {
 		   
 		   LayoutInflater inflater = (LayoutInflater)myContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		   View row = inflater.inflate(R.layout.listview_myevent, parent, false);
+		   View row = inflater.inflate(R.layout.listview_my_event, parent, false);
 		   
 		   TextView eventName = (TextView)row.findViewById(R.id.event_name);
 		   eventName.setText(myEventName[position]);
@@ -101,7 +101,7 @@ public class FacebookFragment extends ListFragment {
     	.defaultDisplayImageOptions(options)
     	.build();
 		imageLoader.init(config);
-		myListAdapter = new ListItemAdapter(getActivity(), R.layout.listview_myevent, myEventName);
+		myListAdapter = new ListItemAdapter(getActivity(), R.layout.listview_my_event, myEventName);
 		setListAdapter(myListAdapter);
 	}
 	
@@ -135,7 +135,7 @@ public class FacebookFragment extends ListFragment {
 		myEventName		= Account.getInstance().getEventNameStringArray();
 		myEventContent 	= Account.getInstance().getEventContentStringArray();
 		myEventImage 	= Account.getInstance().getEventImageStringArray();
-		myListAdapter = new ListItemAdapter(getActivity(), R.layout.listview_myevent, myEventName);
+		myListAdapter = new ListItemAdapter(getActivity(), R.layout.listview_my_event, myEventName);
 		setListAdapter(myListAdapter);
 	}
 	

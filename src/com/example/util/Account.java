@@ -58,7 +58,6 @@ public class Account{
 			}else{
 				checkedItems[i] = false;
 			}
-			
 		}
 		new AlertDialog.Builder(activity)
 	    // Set the dialog title
@@ -194,6 +193,10 @@ public class Account{
 	
 	public String getUserID(){
 		return userID;
+	}
+	
+	public String getUserName(){
+		return username;
 	}
 	
 	public int getMyPreference(){

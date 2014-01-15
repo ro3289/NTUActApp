@@ -71,7 +71,7 @@ public class MainActivity extends FragmentActivity {
 			   				  .setIndicator("帳號管理"), 
 					  TwitterFragment.class, 
 					  null);
-		//4
+		//5
 		tabHost.addTab(tabHost.newTabSpec("常用連結")
 			   				  .setIndicator("常用連結"), 
 					  	ConnectFragment.class, 

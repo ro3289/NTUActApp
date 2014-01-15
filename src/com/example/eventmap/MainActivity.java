@@ -18,6 +18,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTabHost;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -108,8 +109,8 @@ public class MainActivity extends FragmentActivity {
         });
         
         // Test for dialog
-        Button infoDialog = (Button) findViewById(R.id.get_info);
-        infoDialog.setOnClickListener(new View.OnClickListener() {
+        Button setPreference = (Button) findViewById(R.id.set_preference);
+        setPreference.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				Account.getInstance().showMyPreference();
@@ -121,6 +122,19 @@ public class MainActivity extends FragmentActivity {
         pickFriendButton.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
             	startPickFriendsActivity();
+            }
+        });
+        
+        final Button switchButton = (Button) findViewById(R.id.preference_friend_switch);
+        switchButton.setOnClickListener(new Button.OnClickListener() {
+            public void onClick(View v) {
+            	if(switchButton.getText().equals("朋友活動")){
+            		switchButton.setText("我的偏好");
+            		//switchToMypreference();
+            	} else {
+            		switchButton.setText("朋友活動");
+            		switchToFriendPreference();
+            	}
             }
         });
         
@@ -226,6 +240,10 @@ public class MainActivity extends FragmentActivity {
 	public void updatePreferenceEvent(){
 		TwitterFragment eventFragment = (TwitterFragment) getSupportFragmentManager().findFragmentByTag("偏好瀏覽");
         if(eventFragment != null) eventFragment.updatePreferenceEvent();
+	}
+	
+	private void switchToFriendPreference(){
+
 	}
 	
 	@Override

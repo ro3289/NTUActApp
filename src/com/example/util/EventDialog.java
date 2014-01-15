@@ -203,7 +203,6 @@ public class EventDialog {
 	    // Specify the list array, the items to be selected by default (null for none),
 	    // and the listener through which to receive callbacks when items are selected
        .show();
-
 	}
 	
 	public class ListItemAdapter extends ArrayAdapter<String> {

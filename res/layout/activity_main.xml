@@ -38,19 +38,24 @@
 		        android:layout_height="wrap_content"
 		        android:layout_gravity="center_horizontal"
 		        android:layout_alignParentBottom="true"
-		        android:text="MAP" />
+		        android:text="活動地圖" />
 		    
 		     <Button
-			    android:id="@+id/get_info"
+			    android:id="@+id/set_preference"
 			    android:layout_height="wrap_content"
 			    android:layout_width="wrap_content"
-			    android:text="Info Dialog Test"  />
+			    android:text="偏好設定"  />
 		     
 		     <Button
 			    android:id="@+id/pick_friend"
 			    android:layout_height="wrap_content"
 			    android:layout_width="wrap_content"
-			    android:text="Pick Friend"  />
+			    android:text="選擇朋友"  />
+		     <Button 
+		        android:id="@+id/preference_friend_switch"
+			    android:layout_height="wrap_content"
+			    android:layout_width="wrap_content"
+			    android:text="朋友活動" />
 		</LinearLayout>  
 
 </LinearLayout>

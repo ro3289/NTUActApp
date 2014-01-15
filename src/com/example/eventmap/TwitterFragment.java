@@ -14,6 +14,7 @@ import com.example.pageviewitem.ViewPagerItem;
 import com.example.util.Account;
 import com.example.util.DBConnector;
 import com.example.util.EventInfo;
+import com.facebook.model.GraphUser;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
@@ -45,6 +46,9 @@ public class TwitterFragment extends Fragment {
 	private ArrayList<String> imageSourceList = new ArrayList<String>();
 	private String[] imageSource;
 	private int layerCount;
+	
+	private HashMap<Integer, ArrayList<GraphUser>> eventToFriend = new HashMap<Integer, ArrayList<GraphUser>>();
+	
 
 	@Override
 	public void onAttach(Activity activity) {
@@ -212,5 +216,46 @@ public class TwitterFragment extends Fragment {
 	 private boolean isMyPreference(int tag, int preference){
 		 return ((tag & preference) == preference);
 	 }
-	
+	 
+	 public void updateMyFriendEvent(){
+		 imageSourceList.clear();
+		 eventToFriend.clear();
+		 HashMap<Integer,EventInfo> eventList = MainActivity.getEventList();
+		 
+		 FriendPickerApplication application = (FriendPickerApplication) getActivity().getApplication();
+         List<GraphUser> selectedUsers = application.getSelectedUsers();
+         
+         if (selectedUsers != null) {
+        	 for(GraphUser friend : selectedUsers){
+        		 String friendEvent;
+				try {
+					friendEvent = new DBConnector().execute("SELECT ActID FROM user_act WHRER UserID = '" + friend.getId() + "'").get();
+					 JSONArray jsonArray = new JSONArray(friendEvent);
+	        		 for(int index = 0; index < jsonArray.length(); ++index){
+	        			 int eventID = jsonArray.getJSONObject(index).getInt("ActID");
+	        			 if(eventToFriend.containsKey(eventID)){
+	        				 eventToFriend.get(eventID).add(friend);
+	        			 } else {
+	        				 ArrayList<GraphUser> newList = new ArrayList<GraphUser>();
+	        				 newList.add(friend);
+	        				 eventToFriend.put(eventID, newList);
+	        				 imageSourceList.add(eventList.get(eventID).image);
+	        			 }
+	        		 }
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (ExecutionException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+    		 }
+         }
+		 imageSource = imageSourceList.toArray(new String[imageSourceList.size()]);
+		 layerCount = ((imageSource.length % 2 == 0)? (imageSource.length)/2 : (imageSource.length+1)/2);
+		 gridview1.setAdapter(new ItemAdapter(getActivity()));
+	 }
 }

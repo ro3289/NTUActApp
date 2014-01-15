@@ -15,4 +15,8 @@
     <string name="log_in">登入</string>
     <string name="sign_up">註冊</string>
     <string name="app_id">355198514515820</string>
+	<string name="hello_user">您好  %1$s!</string>
+	<string name="no_friends_selected">no friend</string>
+	<string name="you_picked">you pick</string>
+	<string name="exception">Exception: %1$s</string>
 </resources>

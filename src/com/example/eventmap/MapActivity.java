@@ -94,21 +94,23 @@ public class MapActivity extends Activity implements OnInfoWindowClickListener{
 	{
 		try {
 			// Fetch data from remote server
-			String resultData = new DBConnector().execute("SELECT * FROM activity").get();
+			String resultData = new DBConnector().execute("SELECT * FROM " + DBConnector.table_activity).get();
+			String imageQuery = new DBConnector().execute("SELECT * FROM " + DBConnector.table_image).get();
 			JSONArray jsonArray = new JSONArray(resultData);
+			JSONArray imageJsonArray = new JSONArray(imageQuery);
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			for(int index = 0; index < jsonArray.length(); ++index)
 			{
-				int    ID 	    = jsonArray.getJSONObject(index).getInt("ID");
+				int    ID 	    = jsonArray.getJSONObject(index).getInt("id");
 				String name 	= jsonArray.getJSONObject(index).getString("Name");
 				String location = jsonArray.getJSONObject(index).getString("Location");
 				String url 		= jsonArray.getJSONObject(index).getString("Url");
-				String image	= jsonArray.getJSONObject(index).getString("ImageUrl");
 				String content 	= jsonArray.getJSONObject(index).getString("Content");
 				String date 	= jsonArray.getJSONObject(index).getString("Time");
+				int    tag 	    = jsonArray.getJSONObject(index).getInt("Tag");
 				double lat 		= jsonArray.getJSONObject(index).getDouble("Latitude");
 				double lng 		= jsonArray.getJSONObject(index).getDouble("Longitude");
-				int    tag		= jsonArray.getJSONObject(index).getInt("Tag");
+				String image	= DBConnector.image_pre_url + imageJsonArray.getJSONObject(index).getString("img");
 				// Construct events
 				try {
 					createEvent(ID, name, location, url, image, content, new LatLng(lat, lng), sdf.parse(date), tag);
@@ -354,13 +356,13 @@ public class MapActivity extends Activity implements OnInfoWindowClickListener{
 			if(searchText.getText().toString().equals("")) {
 				System.out.println("thisline");
 			} else {
-	    		String myEventData = new DBConnector().execute("SELECT * FROM activity WHERE Name LIKE '%"+searchText.getText().toString()+"%' OR Content LIKE '%"+searchText.getText().toString()+"%'").get();
+	    		String myEventData = new DBConnector().execute("SELECT * FROM "+ DBConnector.table_activity + " WHERE Name LIKE '%"+searchText.getText().toString()+"%' OR Content LIKE '%"+searchText.getText().toString()+"%'").get();
 				JSONArray jsonArray = new JSONArray(myEventData);
 				ArrayList<String> myEventNameList 	 = new ArrayList<String>();
 				ArrayList<String> myEventContentList = new ArrayList<String>();
 				ArrayList<String> myEventImageList 	 = new ArrayList<String>();
 				for(int index = 0; index < jsonArray.length(); ++index) {
-					int eventID = jsonArray.getJSONObject(index).getInt("ID");
+					int eventID = jsonArray.getJSONObject(index).getInt("id");
 					myEventNameList.add(eventList.get(eventID).name);
 					myEventContentList.add(eventList.get(eventID).content);
 					myEventImageList.add(eventList.get(eventID).image);
@@ -392,7 +394,9 @@ public class MapActivity extends Activity implements OnInfoWindowClickListener{
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 				// EventDialog.getInstance().showEventInfoDialog(eventList.get(searchEventIdList.get(which)), null);
-				map.moveCamera(CameraUpdateFactory.newLatLngZoom(eventList.get(searchEventIdList.get(which)).point, 16));
+				EventInfo event = eventList.get(searchEventIdList.get(which));
+				map.moveCamera(CameraUpdateFactory.newLatLngZoom(event.point, 16));
+				
 			}
 		})
 	    // Specify the list array, the items to be selected by default (null for none),

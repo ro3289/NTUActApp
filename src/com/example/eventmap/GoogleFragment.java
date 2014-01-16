@@ -13,6 +13,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 
 
+
 import com.example.pageviewitem.ViewPagerItem;
 import com.example.util.DBConnector;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
@@ -143,7 +144,6 @@ public class GoogleFragment extends Fragment {
 				
 				if(getItemViewType(position)==0)
 				{
-					System.out.println("roarrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr"+position);
 					view =  LayoutInflater.from(mContext).inflate(R.layout.gridview_newevent1, parent, false);
 					holder.text = (TextView) view.findViewById(R.id.text);
 					holder.image1 = (ImageView) view.findViewById(R.id.image);	
@@ -153,7 +153,6 @@ public class GoogleFragment extends Fragment {
 							
 					    }
 					});
-					System.out.println("roarrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr"+position);
 				}else if(getItemViewType(position)==1){
 					view =  LayoutInflater.from(mContext).inflate(R.layout.gridview_newevent2, parent, false);
 					holder.text = (TextView) view.findViewById(R.id.text);
@@ -175,7 +174,6 @@ public class GoogleFragment extends Fragment {
 			if(getItemViewType(position)==0)
 			{
 				imageLoader.displayImage(imageDayList.get(position).get(0), holder.image1, options, animateFirstListener);
-				System.out.println("roarrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr"+position+"123");
 			}else if(getItemViewType(position)==1){
 				imageLoader.displayImage(imageDayList.get(position).get(0), holder.image1, options, animateFirstListener);
 				imageLoader.displayImage(imageDayList.get(position).get(1), holder.image2, options, animateFirstListener);
@@ -185,7 +183,6 @@ public class GoogleFragment extends Fragment {
 				imageLoader.displayImage(imageDayList.get(position).get(2), holder.image3, options, animateFirstListener);
 			}
 			holder.text.setText(imageDay.get(position));
-			System.out.println("roarrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr"+position+"123");
 			return view;
 		}
 	}
@@ -212,22 +209,22 @@ public class GoogleFragment extends Fragment {
 	
 	public void updateHotEvent(){
     	try {
-			String result = new DBConnector().execute("SELECT ID, Name, ImageUrl, Time FROM activity WHERE NOW()<Time ORDER BY Time").get();
+			String result = new DBConnector().execute("SELECT id, Name, Time FROM "+ DBConnector.table_activity +" WHERE NOW()<Time ORDER BY Time").get();
 			System.out.println(result);
 			JSONArray jsonArray = new JSONArray(result);
 			int upperbound = jsonArray.length();
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-			//SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd-MM-yyyy");
 	        
 			int index=0;
 			int index3=0;
-			//System.out.println("roarrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr"+upperbound);
 			if(index3!=upperbound)
 			{
 				ArrayList<String> imageSourceList = new ArrayList<String>();
-				int    ID 	 = jsonArray.getJSONObject(index3).getInt("ID");
+				int    ID 	 = jsonArray.getJSONObject(index3).getInt("id");
+				String imageQuery = new DBConnector().execute("SELECT img FROM " + DBConnector.table_image + " WHERE event_id = " + ID).get();
+				JSONArray imageJsonArray = new JSONArray(imageQuery);
 				String name  = jsonArray.getJSONObject(index3).getString("Name");
-				String image = jsonArray.getJSONObject(index3).getString("ImageUrl");
+				String image = DBConnector.image_pre_url + imageJsonArray.getJSONObject(index3).getString("img");
 				String date_ini=jsonArray.getJSONObject(index3).getString("Time");
 				date_ini=sdf.format(sdf.parse(date_ini));	
 				System.out.println(date_ini);
@@ -244,7 +241,6 @@ public class GoogleFragment extends Fragment {
 					{
 					imageDayList.add(imageSourceList);
 					imageDay.add(date_ini);
-					//System.out.println("roarrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr5");
 					System.out.println(imageDayList.size());
 					System.out.println(imageSourceList.size());
 					System.out.println(imageDay.size());
@@ -254,18 +250,7 @@ public class GoogleFragment extends Fragment {
 						break;
 				}
 				
-				//System.out.println("roarrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr");
-				/*ArrayList<String> imageSourceList = new ArrayList<String>();
-				int    ID 	 = jsonArray.getJSONObject(index3).getInt("ID");
-				String name  = jsonArray.getJSONObject(index3).getString("Name");
-				String image = jsonArray.getJSONObject(index3).getString("ImageUrl");
-				String date_ini=jsonArray.getJSONObject(index3).getString("Time");
-				date_ini=sdf.format(sdf.parse(date_ini));	
-				System.out.println(date_ini);*/
-
-				//String date="";
 				for(int index2 = 1; index2 < NUMBER_OF_EVENTS; ++index2){
-					//System.out.println("roarrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr3");
 					if(index3==upperbound)
 					{
 						imageDayList.add(imageSourceList);
@@ -274,15 +259,14 @@ public class GoogleFragment extends Fragment {
 						break;
 					}
 					
-					ID 	 = jsonArray.getJSONObject(index3).getInt("ID");
+					ID 	 = jsonArray.getJSONObject(index3).getInt("id");
 					name  = jsonArray.getJSONObject(index3).getString("Name");
-					image = jsonArray.getJSONObject(index3).getString("ImageUrl");
+					image = DBConnector.image_pre_url + imageJsonArray.getJSONObject(index3).getString("img");
 					date  = jsonArray.getJSONObject(index3).getString("Time");
 					date = sdf.format(sdf.parse(date));
 					System.out.println(date);
 					index3++;
-					if(!date.equals(date_ini))
-					{System.out.println("roarrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr4");
+					if(!date.equals(date_ini)){
 						++index;
 						imageDay.add(date_ini);
 						date_ini=date.toString();
@@ -292,7 +276,6 @@ public class GoogleFragment extends Fragment {
 						imageSourceList = new ArrayList<String>();
 						imageSourceList.add(image);
 						
-						System.out.println("roarrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr5 "+index3);
 						break;
 					}
 					imageSourceList.add(image);

@@ -19,6 +19,14 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 public class DBConnector extends AsyncTask<String, Void, String>{
+	
+	public static String table_activity = new String("posts_post");
+	public static String table_image    = new String("posts_image");
+	public static String table_userlist = new String("users_myuser");
+	public static String table_user_act = new String("users_user_act");
+	public static String table_invitation = new String("users_invitation");
+	public static String image_pre_url  = new String("http://140.112.18.222:8000/media/");
+	
 	@Override
     protected String doInBackground(String... query_string) {
         String result = "";

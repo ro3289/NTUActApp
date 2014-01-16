@@ -67,7 +67,13 @@ public class MainActivity extends FragmentActivity {
 	private static int MY_EVENT_FRAGMENT = 0;
 	private static int HOT_EVENT_FRAGMENT = 1;
 	public boolean MY_PREFERENCE = true;
-	
+	private TextView invite_cnt;
+	private int count;
+	private ArrayList<Integer> inviteList=new ArrayList<Integer>();
+	private ArrayList<String> inviteNameList=new ArrayList<String>();
+	private ArrayList<String> inviteImageList=new ArrayList<String>();
+	private HashMap<Integer,ArrayList<String>> inviterList = new HashMap<Integer, ArrayList<String>>();
+
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -175,6 +181,7 @@ public class MainActivity extends FragmentActivity {
         
         setUpFacebookLoginDialog();
         facebookLoginDialog.show();
+        count_invite_number();
     }
    
     private void getEventInfo()
@@ -654,4 +661,123 @@ public class MainActivity extends FragmentActivity {
 			}
 		}
 	}
+    
+    private void count_invite_number()
+    {
+		try {
+			count=0;
+			inviteList=new ArrayList<Integer>();
+			inviterList = new HashMap<Integer, ArrayList<String>>();
+
+			String result = new DBConnector().execute("SELECT * FROM invitation WHERE userID ="+user.getId()).get();
+
+			JSONArray newJsonArray = new JSONArray(result);
+			for(int index=0; index<newJsonArray.length();index++)
+			{
+				String inviteID   = newJsonArray.getJSONObject(index).getString("inviteID");
+				int actID         = newJsonArray.getJSONObject(index).getInt("actID");
+				int see           = newJsonArray.getJSONObject(index).getInt("see");
+				if(inviterList!=null && inviterList.get(actID).size()==0)
+				{
+					ArrayList<String> inviter = new ArrayList<String>();
+					inviter.add(inviteID);
+					inviterList.put(actID, inviter);
+					inviteList.add(actID);
+					inviteImageList.add(eventList.get(actID).image);
+				}
+				else
+				{
+					ArrayList<String> tmp=inviterList.get(actID);
+					tmp.add(inviteID);
+					inviterList.put(actID,tmp);
+				}
+				if(see==0)
+					count++;
+			}
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		invite_cnt.setText(count);
+    }
+    public void showInvitation(View view)
+    {
+    
+		String myInviteList[]=inviteNameList.toArray(new String[inviteNameList.size()]);
+    	ListItemAdapter2 myListItemAdapter = new ListItemAdapter2(this, R.layout.invitation_list, myInviteList);
+		new AlertDialog.Builder(this)
+	    // Set the dialog title
+		.setTitle("Invite")
+		.setAdapter( myListItemAdapter, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				EventDialog.getInstance().showEventInfoDialog(eventList.get(searchEventIdList.get(which)), null);//not sure
+			}
+		})
+	    // Specify the list array, the items to be selected by default (null for none),
+	    // and the listener through which to receive callbacks when items are selected
+       .show();
+    }
+    public class ListItemAdapter2 extends ArrayAdapter<String> {
+        private ImageLoadingListener animateFirstListener = new AnimateFirstDisplayListener();
+      	  Context myContext;
+      	
+      	  public ListItemAdapter2(Context context, int textViewResourceId, String[] objects) {
+      		  super(context, textViewResourceId, objects);
+      		  myContext = context;
+      	  } 
+      		  @Override
+      		  public View getView(int position, View convertView, ViewGroup parent) {
+      		   
+      		   LayoutInflater inflater = (LayoutInflater) myContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);//
+      		   View row = inflater.inflate(R.layout.invitation_list, parent, false);
+      		  TextView eventName = (TextView)row.findViewById(R.id.event_name);
+    		   eventName.setText(inviteNameList.get(position));
+    		   
+    		   TextView invitercount = (TextView)row.findViewById(R.id.inviter_cnt);
+    		   invitercount.setText("有"+inviterList.get(inviteList.get(position)).size()+"邀請你");
+    		   
+    		   ImageView image=(ImageView)row.findViewById(R.id.image);
+    		   imageLoader.displayImage(inviteImageList.get(position), image, options, animateFirstListener);
+    		   
+    		   final Button followButton = (Button) row.findViewById(R.id.follow);
+    			followButton.setText("追蹤");
+    			followButton.setOnClickListener(new Button.OnClickListener(){
+    				@Override
+    				public void onClick(View v) {
+    					
+    				}
+    				
+    			});
+    			final Button nofollowButton = (Button) row.findViewById(R.id.no_follow);
+    			followButton.setText("不追蹤");
+    			followButton.setOnClickListener(new Button.OnClickListener(){
+    				@Override
+    				public void onClick(View v) {
+    					
+    				}
+    				
+    			});
+    			final Button waitButton = (Button) row.findViewById(R.id.wait);
+    			followButton.setText("再考慮");
+    			followButton.setOnClickListener(new Button.OnClickListener(){
+    				@Override
+    				public void onClick(View v) {
+    					
+    				}
+    				
+    			});
+    		   
+      		   return row;
+      		  } 		  
+      		
+      		  
+      	}
+   
 }

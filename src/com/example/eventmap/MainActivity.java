@@ -31,7 +31,6 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import com.example.util.Account;
@@ -138,7 +137,6 @@ public class MainActivity extends FragmentActivity {
 			@Override
 			public void onClick(View v) {
 				Account.getInstance().showMyPreference();
-				//Account.getInstance().showMyEvent();
 			}
 		});
         
@@ -180,23 +178,27 @@ public class MainActivity extends FragmentActivity {
     private void getEventInfo()
     {
     	try {
-			String resultData = new DBConnector().execute("SELECT * FROM activity").get();
+			String resultData = new DBConnector().execute("SELECT * FROM " + DBConnector.table_activity).get();
+			String imageQuery = new DBConnector().execute("SELECT * FROM " + DBConnector.table_image).get();
 			JSONArray jsonArray = new JSONArray(resultData);
+			JSONArray imageJsonArray = new JSONArray(imageQuery);
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			for(int index = 0; index < jsonArray.length(); ++index)
 			{
-				int    ID 	    = jsonArray.getJSONObject(index).getInt("ID");
+				int    ID 	    = jsonArray.getJSONObject(index).getInt("id");
 				String name 	= jsonArray.getJSONObject(index).getString("Name");
 				String location = jsonArray.getJSONObject(index).getString("Location");
 				String url 		= jsonArray.getJSONObject(index).getString("Url");
-				String image	= jsonArray.getJSONObject(index).getString("ImageUrl");
 				String content 	= jsonArray.getJSONObject(index).getString("Content");
 				String date 	= jsonArray.getJSONObject(index).getString("Time");
 				int    tag 	    = jsonArray.getJSONObject(index).getInt("Tag");
 				double lat 		= jsonArray.getJSONObject(index).getDouble("Latitude");
 				double lng 		= jsonArray.getJSONObject(index).getDouble("Longitude");
+				String image	= DBConnector.image_pre_url + imageJsonArray.getJSONObject(index).getString("img");
 				try {
-					eventList.put(ID, new EventInfo(ID, name, location, new LatLng(lat,lng) ,url, image, content, sdf.parse(date), tag));
+					EventInfo event = new EventInfo(ID, name, location, new LatLng(lat,lng) ,url, image, content, sdf.parse(date), tag);
+					eventList.put(ID, event);
+					System.out.println(eventList.size());
 				} catch (ParseException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -218,7 +220,7 @@ public class MainActivity extends FragmentActivity {
     private void getUserEvent(){
     	// Tracing events
     	try {
-			String myEventData = new DBConnector().execute("SELECT * FROM user_act WHERE UserID ='" + Account.getInstance().getUserID() + "'").get();
+			String myEventData = new DBConnector().execute("SELECT * FROM " + DBConnector.table_user_act + " WHERE UserID ='" + Account.getInstance().getUserID() + "'").get();
 			JSONArray jsonArray = new JSONArray(myEventData);
 			Account.getInstance().clearEvent();
 			for(int index = 0; index < jsonArray.length(); ++index)
@@ -434,13 +436,13 @@ public class MainActivity extends FragmentActivity {
     public void updateUserInfo(String name, String id){
     	// User information and preference
     	try {
-			String accountData = new DBConnector().execute("SELECT * FROM userlist WHERE ID =" + "'" + id + "'").get();
+			String accountData = new DBConnector().execute("SELECT * FROM " + DBConnector.table_userlist + " WHERE fbID =" + "'" + id + "'").get();
 			JSONArray jsonArray = new JSONArray(accountData);
 			if(jsonArray.length() != 0)
 			{
-				String userID 	  = jsonArray.getJSONObject(0).getString("ID");
-				String username   = jsonArray.getJSONObject(0).getString("Username");
-				int    preference = jsonArray.getJSONObject(0).getInt("Preference");
+				String userID 	  = jsonArray.getJSONObject(0).getString("fbID");
+				String username   = jsonArray.getJSONObject(0).getString("username");
+				int    preference = jsonArray.getJSONObject(0).getInt("preference");
 				Account.updateAccount(this, userID, username, preference);
 				return;
 			}
@@ -455,15 +457,15 @@ public class MainActivity extends FragmentActivity {
 			e.printStackTrace();
 		}
     	// Create new account if not
-		new DBConnector().execute("INSERT INTO userlist (Username, ID) VALUES ('" + name + "','" + id + "')");
+		new DBConnector().execute("INSERT INTO " + DBConnector.table_userlist + " (username, fbID) VALUES ('" + name + "','" + id + "')");
 		try {
-			String newAccountData = new DBConnector().execute("SELECT * FROM userlist WHERE ID =" + "'" + id + "'").get();
+			String newAccountData = new DBConnector().execute("SELECT * FROM "+DBConnector.table_userlist+" WHERE fbID =" + "'" + id + "'").get();
 			JSONArray newJsonArray = new JSONArray(newAccountData);
 			if(newJsonArray.length() != 0)
 			{
-				String userID     = newJsonArray.getJSONObject(0).getString("ID");
-				String username   = newJsonArray.getJSONObject(0).getString("Username");
-				int    preference = newJsonArray.getJSONObject(0).getInt("Preference");
+				String userID     = newJsonArray.getJSONObject(0).getString("fbID");
+				String username   = newJsonArray.getJSONObject(0).getString("username");
+				int    preference = newJsonArray.getJSONObject(0).getInt("preference");
 				Account.updateAccount(this, userID, username, preference);
 				return;
 			}

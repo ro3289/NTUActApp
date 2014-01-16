@@ -191,13 +191,15 @@ public class AppleFragment extends Fragment {
 	
     public void updateHotEvent(){
     	try {
-			String result = new DBConnector().execute("SELECT ID, Name, ImageUrl FROM activity ORDER BY Follower DESC").get();
+			String result     = new DBConnector().execute("SELECT id, Name FROM " + DBConnector.table_activity + " ORDER BY Follower DESC").get();
 			JSONArray jsonArray = new JSONArray(result);
 			int upperbound = ((jsonArray.length() < NUMBER_OF_EVENTS)? jsonArray.length(): NUMBER_OF_EVENTS);
 			for(int index = 0; index < upperbound; ++index){
-				int    ID 	 = jsonArray.getJSONObject(index).getInt("ID");
+				int    ID 	 = jsonArray.getJSONObject(index).getInt("id");
+				String imageQuery = new DBConnector().execute("SELECT img FROM " + DBConnector.table_image + " WHERE event_id = " + ID).get();
+				JSONArray imageJsonArray = new JSONArray(imageQuery);
 				String name  = jsonArray.getJSONObject(index).getString("Name");
-				String image = jsonArray.getJSONObject(index).getString("ImageUrl");
+				String image = DBConnector.image_pre_url + imageJsonArray.getJSONObject(index).getString("img");
 				imageSourceList.add(image);
 			}
 			imageSource = imageSourceList.toArray(new String[imageSourceList.size()]);

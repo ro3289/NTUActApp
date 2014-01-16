@@ -284,7 +284,7 @@ public class EventDialog {
                	{
               		String result2;
 					try {
-						result2 = new DBConnector().execute("SELECT * FROM invitation WHERE userID ="+inviteList.get(index)+" AND inviteID ="+Account.INSTANCE.getUserID()+" AND actID = "+e.id).get();
+						result2 = new DBConnector().execute("SELECT * FROM " + DBConnector.table_invitation + " WHERE userID ="+inviteList.get(index)+" AND inviteID ="+Account.INSTANCE.getUserID()+" AND actID = "+e.id).get();
 					
             		JSONArray jsonArray = new JSONArray(result2);
                     for(int index2 = 0; index2 < jsonArray.length(); ++index2){
@@ -301,7 +301,7 @@ public class EventDialog {
 						// TODO Auto-generated catch block
 						//e1.printStackTrace();
 						try {
-							String result = new DBConnector().execute("INSERT INTO invitation (userID,inviteID,actID) VALUES ("+inviteList.get(index)+","+	Account.INSTANCE.getUserID()+","+e.id+")").get();
+							String result = new DBConnector().execute("INSERT INTO " + DBConnector.table_invitation + " (userID,inviteID,actID) VALUES ("+inviteList.get(index)+","+	Account.INSTANCE.getUserID()+","+e.id+")").get();
 						} catch (InterruptedException e2) {
 							// TODO Auto-generated catch block
 							e2.printStackTrace();
@@ -418,7 +418,7 @@ public class EventDialog {
                    	{
                   		String result2;
     					try {
-    						result2 = new DBConnector().execute("SELECT * FROM invitation WHERE userID ='"+inviteList.get(index)+"' AND inviteID ='"+Account.INSTANCE.getUserID()+"' AND actID = '"+e.id+"'").get();
+    						result2 = new DBConnector().execute("SELECT * FROM "+DBConnector.table_invitation+" WHERE userID ='"+inviteList.get(index)+"' AND inviteID ='"+Account.INSTANCE.getUserID()+"' AND actID = '"+e.id+"'").get();
     					
                 		JSONArray jsonArray = new JSONArray(result2);
                         for(int index2 = 0; index2 < jsonArray.length(); ++index2){
@@ -435,7 +435,7 @@ public class EventDialog {
     						// TODO Auto-generated catch block
     						//e1.printStackTrace();
     						try {
-								String result = new DBConnector().execute("INSERT INTO invitation (userID,inviteID,actID) VALUES ("+inviteList.get(index)+","+	Account.INSTANCE.getUserID()+","+e.id+")").get();
+								String result = new DBConnector().execute("INSERT INTO "+DBConnector.table_invitation+" (userID,inviteID,actID) VALUES ("+inviteList.get(index)+","+	Account.INSTANCE.getUserID()+","+e.id+")").get();
 							} catch (InterruptedException e2) {
 								// TODO Auto-generated catch block
 								e2.printStackTrace();

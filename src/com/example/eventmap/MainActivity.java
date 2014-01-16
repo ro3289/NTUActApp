@@ -179,9 +179,7 @@ public class MainActivity extends FragmentActivity {
     {
     	try {
 			String resultData = new DBConnector().execute("SELECT * FROM " + DBConnector.table_activity).get();
-			String imageQuery = new DBConnector().execute("SELECT * FROM " + DBConnector.table_image).get();
 			JSONArray jsonArray = new JSONArray(resultData);
-			JSONArray imageJsonArray = new JSONArray(imageQuery);
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			for(int index = 0; index < jsonArray.length(); ++index)
 			{
@@ -194,6 +192,8 @@ public class MainActivity extends FragmentActivity {
 				int    tag 	    = jsonArray.getJSONObject(index).getInt("Tag");
 				double lat 		= jsonArray.getJSONObject(index).getDouble("Latitude");
 				double lng 		= jsonArray.getJSONObject(index).getDouble("Longitude");
+				String imageQuery = new DBConnector().execute("SELECT img FROM " + DBConnector.table_image + "WHERE event_id = " + ID).get();
+				JSONArray imageJsonArray = new JSONArray(imageQuery);
 				String image	= DBConnector.image_pre_url + imageJsonArray.getJSONObject(index).getString("img");
 				try {
 					EventInfo event = new EventInfo(ID, name, location, new LatLng(lat,lng) ,url, image, content, sdf.parse(date), tag);

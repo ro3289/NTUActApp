@@ -289,7 +289,9 @@ public class MainActivity extends FragmentActivity {
 	    	AppleFragment eventFragment = (AppleFragment)getSupportFragmentManager().findFragmentByTag("熱門活動");
 	        if(eventFragment != null) eventFragment.updateHotEvent();
 	    }else if (requestCode == PICK_FRIENDS_ACTIVITY){
-	    	updateMyFriendEvent();
+	    	if(!MY_PREFERENCE){
+	    		updateMyFriendEvent();
+	    	}
 	    }
 	    uiHelper.onActivityResult(requestCode, resultCode, data, dialogCallback);
 	}
@@ -565,13 +567,13 @@ public class MainActivity extends FragmentActivity {
 			if(searchText.getText().toString().equals("")) {
 				System.out.println("thisline");
 			} else {
-	    		String myEventData = new DBConnector().execute("SELECT * FROM activity WHERE Name LIKE '%"+searchText.getText().toString()+"%' OR Content LIKE '%"+searchText.getText().toString()+"%'").get();
+	    		String myEventData = new DBConnector().execute("SELECT * FROM " + DBConnector.table_activity + " WHERE Name LIKE '%"+searchText.getText().toString()+"%' OR Content LIKE '%"+searchText.getText().toString()+"%'").get();
 				JSONArray jsonArray = new JSONArray(myEventData);
 				ArrayList<String> myEventNameList 	 = new ArrayList<String>();
 				ArrayList<String> myEventContentList = new ArrayList<String>();
 				ArrayList<String> myEventImageList 	 = new ArrayList<String>();
 				for(int index = 0; index < jsonArray.length(); ++index) {
-					int eventID = jsonArray.getJSONObject(index).getInt("ID");
+					int eventID = jsonArray.getJSONObject(index).getInt("id");
 					searchEventIdList.add(eventID);
 					myEventNameList.add(eventList.get(eventID).name);
 					myEventContentList.add(eventList.get(eventID).content);

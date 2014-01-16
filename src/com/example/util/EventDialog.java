@@ -105,18 +105,18 @@ public class EventDialog {
 				if(trackEventButton.getText().toString().equals("追蹤活動")){
 					trackEventButton.setText("追蹤中");
 					Account.getInstance().addMyEvent(event);
-					new DBConnector().execute("INSERT INTO user_act (UserID, UserName, ActID, ActName) VALUES "
+					new DBConnector().execute("INSERT INTO "+ DBConnector.table_user_act +" (UserID, UserName, ActID, ActName) VALUES "
 							+ "('" + Account.getInstance().getUserID() 
 							+ "','"+ Account.getInstance().getUserName() 
 							+ "'," + event.id 
 							+ ",'" + event.name 
 							+"')");
-					new DBConnector().execute("UPDATE activity SET Follower = Follower + 1 WHERE ID = " + event.id);
+					new DBConnector().execute("UPDATE "+ DBConnector.table_activity +" SET Follower = Follower + 1 WHERE id = " + event.id);
 				}else{
 					trackEventButton.setText("追蹤活動");
 					Account.getInstance().deleteMyEvent(event);
-					new DBConnector().execute("DELETE FROM user_act WHERE UserID = '" + Account.getInstance().getUserID() + "'" + " AND ActID = " + event.id);
-					new DBConnector().execute("UPDATE activity SET Follower = Follower - 1 WHERE ID = " + event.id);
+					new DBConnector().execute("DELETE FROM "+ DBConnector.table_user_act +" WHERE UserID = '" + Account.getInstance().getUserID() + "'" + " AND ActID = " + event.id);
+					new DBConnector().execute("UPDATE "+ DBConnector.table_activity +" SET Follower = Follower - 1 WHERE id = " + event.id);
 				}
 				eventGuests = getEventGuests(event);
 				guestsButton.setText("有" + eventGuests + "人追蹤中");
@@ -211,7 +211,7 @@ public class EventDialog {
 		eventGuestsNameList.clear();
 		eventGuestsList.clear();
 		try {
-			String result = new DBConnector().execute("SELECT UserID, UserName FROM user_act WHERE ActID = " + event.id).get();
+			String result = new DBConnector().execute("SELECT UserID, UserName FROM "+ DBConnector.table_user_act +" WHERE ActID = " + event.id).get();
 			JSONArray jsonArray = new JSONArray(result);
 			for(int index = 0; index < jsonArray.length(); ++index){
 				String guestID   = jsonArray.getJSONObject(index).getString("UserID");
@@ -257,11 +257,11 @@ public class EventDialog {
         		
     			String result2;
 				try {
-					result2 = new DBConnector().execute("SELECT * FROM userlist WHERE ID ="+inviteUser.getId()).get();
+					result2 = new DBConnector().execute("SELECT * FROM "+ DBConnector.table_userlist +" WHERE fbID ="+inviteUser.getId()).get();
 				
         		JSONArray jsonArray = new JSONArray(result2);
                 for(int index = 0; index < jsonArray.length(); ++index){
-                        String userID = jsonArray.getJSONObject(index).getString("ID");
+                        String userID = jsonArray.getJSONObject(index).getString("fbID");
                         inviteList.add(inviteUser.getId());
             			inviteNameList.add(inviteUser.getName());
             			
@@ -277,7 +277,6 @@ public class EventDialog {
 					e1.printStackTrace();
 				}
         	}
-    		System.out.println("hi3");
         	if(inviteList.size()!=0)
             {
         		System.out.println("hi4");
@@ -318,9 +317,7 @@ public class EventDialog {
     	
 		}else {
 			System.out.println("no user");
-    	
 		}
-        System.out.println("herehere");
         if(inviteList!=null&&inviteList.size()!=0)
         {
         	String[] getInviteList = inviteList.toArray(new String[inviteList.size()]);
@@ -332,19 +329,9 @@ public class EventDialog {
     	    // Specify the list array, the items to be selected by default (null for none),
     	    // and the listener through which to receive callbacks when items are selected
            .show();
-        }
-        else
-        {
+        } else {
         	
         }
-		
-		
-		
-		
-		
-		
-		
-		
 
 	}
 	
@@ -405,11 +392,11 @@ public class EventDialog {
             		
         			String result2;
 					try {
-						result2 = new DBConnector().execute("SELECT * FROM userlist WHERE ID ="+inviteUser.getId()).get();
+						result2 = new DBConnector().execute("SELECT * FROM "+ DBConnector.table_userlist +" WHERE fbID ="+inviteUser.getId()).get();
 					
             		JSONArray jsonArray = new JSONArray(result2);
                     for(int index = 0; index < jsonArray.length(); ++index){
-                            String userID = jsonArray.getJSONObject(index).getString("ID");
+                            String userID = jsonArray.getJSONObject(index).getString("fbID");
                             inviteList.add(inviteUser.getId());
                 			inviteNameList.add(inviteUser.getName());
                 			

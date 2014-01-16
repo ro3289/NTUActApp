@@ -103,33 +103,9 @@ public class Account{
 		}
 		myPreference = newPreference;
 		// Update database!!
-		new DBConnector().execute("UPDATE userlist SET Preference = " + myPreference + " WHERE ID = " + userID);
+		new DBConnector().execute("UPDATE "+ DBConnector.table_userlist +" SET Preference = " + myPreference + " WHERE fbID = " + userID);
 		activity.updatePreferenceEvent();
 	}
-	/*
-	public void showMyEvent()
-	{
-		String[] myEventItems = getEventNameStringArray();
-		
-    	new AlertDialog.Builder(activity)
-        .setTitle(R.string.my_events)
-        .setItems(myEventItems, new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				EventDialog.getInstance().showEventInfoDialog(myEventList.get(which), null);
-			}
-		})
-        .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-            }
-        })
-        .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-            }
-        })
-        .show();
-	}
-	*/
 	
 	public static Account getInstance(){
 		return INSTANCE;

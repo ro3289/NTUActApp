@@ -35,7 +35,7 @@ import com.facebook.model.GraphUser;
 import com.facebook.widget.FacebookDialog;
 import com.facebook.widget.LoginButton;
 
-public class FacebookLogin extends FragmentActivity{
+public class FacebookLoginActivity extends FragmentActivity{
 
     private final String PENDING_ACTION_BUNDLE_KEY = "com.facebook.samples.hellofacebook:PendingAction";
 
@@ -88,9 +88,15 @@ public class FacebookLogin extends FragmentActivity{
         loginButton.setUserInfoChangedCallback(new LoginButton.UserInfoChangedCallback() {
             @Override
             public void onUserInfoFetched(GraphUser user) {
-                FacebookLogin.this.user = user;
+                FacebookLoginActivity.this.user = user;
                 // It's possible that we were waiting for this.user to be populated in order to post a
                 // status update.
+                if(user != null){
+	                FriendPickerApplication application = (FriendPickerApplication) getApplication();
+	                application.user = user;
+	                Intent intent = new Intent(FacebookLoginActivity.this, MainActivity.class);
+	                startActivity(intent);
+                }
                 handlePendingAction();
             }
         });
@@ -138,7 +144,7 @@ public class FacebookLogin extends FragmentActivity{
         if (pendingAction != PendingAction.NONE &&
                 (exception instanceof FacebookOperationCanceledException ||
                 exception instanceof FacebookAuthorizationException)) {
-                new AlertDialog.Builder(FacebookLogin.this)
+                new AlertDialog.Builder(FacebookLoginActivity.this)
                     .setTitle(R.string.cancel)
                     .setPositiveButton(R.string.ok, null)
                     .show();

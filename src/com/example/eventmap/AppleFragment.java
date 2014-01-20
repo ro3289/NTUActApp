@@ -199,7 +199,7 @@ public class AppleFragment extends Fragment {
 				String imageQuery = new DBConnector().execute("SELECT img FROM " + DBConnector.table_image + " WHERE event_id = " + ID).get();
 				JSONArray imageJsonArray = new JSONArray(imageQuery);
 				String name  = jsonArray.getJSONObject(index).getString("Name");
-				String image = DBConnector.image_pre_url + imageJsonArray.getJSONObject(index).getString("img");
+				String image = DBConnector.image_pre_url + imageJsonArray.getJSONObject(0).getString("img");
 				imageSourceList.add(image);
 			}
 			imageSource = imageSourceList.toArray(new String[imageSourceList.size()]);

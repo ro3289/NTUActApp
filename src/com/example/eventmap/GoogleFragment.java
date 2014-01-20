@@ -224,7 +224,7 @@ public class GoogleFragment extends Fragment {
 				String imageQuery = new DBConnector().execute("SELECT img FROM " + DBConnector.table_image + " WHERE event_id = " + ID).get();
 				JSONArray imageJsonArray = new JSONArray(imageQuery);
 				String name  = jsonArray.getJSONObject(index3).getString("Name");
-				String image = DBConnector.image_pre_url + imageJsonArray.getJSONObject(index3).getString("img");
+				String image = DBConnector.image_pre_url + imageJsonArray.getJSONObject(0).getString("img");
 				String date_ini=jsonArray.getJSONObject(index3).getString("Time");
 				date_ini=sdf.format(sdf.parse(date_ini));	
 				System.out.println(date_ini);
@@ -261,7 +261,7 @@ public class GoogleFragment extends Fragment {
 					
 					ID 	 = jsonArray.getJSONObject(index3).getInt("id");
 					name  = jsonArray.getJSONObject(index3).getString("Name");
-					image = DBConnector.image_pre_url + imageJsonArray.getJSONObject(index3).getString("img");
+					image = DBConnector.image_pre_url + imageJsonArray.getJSONObject(0).getString("img");
 					date  = jsonArray.getJSONObject(index3).getString("Time");
 					date = sdf.format(sdf.parse(date));
 					System.out.println(date);

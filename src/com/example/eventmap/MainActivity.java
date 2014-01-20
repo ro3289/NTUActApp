@@ -170,11 +170,16 @@ public class MainActivity extends FragmentActivity {
             String name = savedInstanceState.getString(PENDING_ACTION_BUNDLE_KEY);
             pendingAction = PendingAction.valueOf(name);
         }
+        FriendPickerApplication application = (FriendPickerApplication) getApplication();
+        this.user = application.user;
+        updateUserInfo(user.getName(), user.getId());
         
-        setUpFacebookLoginDialog();
-        facebookLoginDialog.show();
+        getEventInfo();
+        getUserEvent();
+
     }
    
+    	
     private void getEventInfo()
     {
     	try {
@@ -194,7 +199,7 @@ public class MainActivity extends FragmentActivity {
 				double lng 		= jsonArray.getJSONObject(index).getDouble("Longitude");
 				String imageQuery = new DBConnector().execute("SELECT img FROM " + DBConnector.table_image + "WHERE event_id = " + ID).get();
 				JSONArray imageJsonArray = new JSONArray(imageQuery);
-				String image	= DBConnector.image_pre_url + imageJsonArray.getJSONObject(index).getString("img");
+				String image	= DBConnector.image_pre_url + imageJsonArray.getJSONObject(0).getString("img");
 				try {
 					EventInfo event = new EventInfo(ID, name, location, new LatLng(lat,lng) ,url, image, content, sdf.parse(date), tag);
 					eventList.put(ID, event);
@@ -397,44 +402,7 @@ public class MainActivity extends FragmentActivity {
         }
     }
     
-    private void setUpFacebookLoginDialog() {
-    	LayoutInflater layoutInflater = this.getLayoutInflater();
-		final View inflater = layoutInflater.inflate(R.layout.layout_facebook_login, null) ;
-		loginButton = (LoginButton) inflater.findViewById(R.id.login_button);
-	    loginButton.setUserInfoChangedCallback(new LoginButton.UserInfoChangedCallback() {
-            @Override
-            public void onUserInfoFetched(GraphUser user) {
-                MainActivity.this.user = user;
-                // It's possible that we were waiting for this.user to be populated in order to post a
-                // status update.
-                checkLogin();
-                handlePendingAction();
-            }
-	    });
-    	facebookLoginDialog = new AlertDialog.Builder(this)
-    	.setTitle("NTUAct")
-    	.setView(inflater)
-        .setNegativeButton(R.string.exit, new DialogInterface.OnClickListener() {
-        	@Override
-            public void onClick(DialogInterface dialog, int whichButton) {
-            	System.exit(0);
-            }
-        })
-        .create();
-    	facebookLoginDialog.setCanceledOnTouchOutside(false);
-    }
-    
-    private void checkLogin(){
-        if ( ensureOpenSession() && user != null) {
-        	updateUserInfo(user.getName(), user.getId());
-        	getEventInfo();
-        	getUserEvent();
-        	facebookLoginDialog.dismiss();
-        } else {
-        	facebookLoginDialog.show();
-        }
-    }
-    
+
     public void updateUserInfo(String name, String id){
     	// User information and preference
     	try {

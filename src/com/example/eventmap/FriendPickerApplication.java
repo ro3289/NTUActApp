@@ -7,7 +7,8 @@ import android.app.Application;
 import com.facebook.model.GraphUser;
 
 public class FriendPickerApplication extends Application {
-    private List<GraphUser> selectedUsers;
+	public  GraphUser user;
+	private List<GraphUser> selectedUsers;
     private List<GraphUser> inviteUsers;
 
     public List<GraphUser> getSelectedUsers() {
@@ -26,4 +27,7 @@ public class FriendPickerApplication extends Application {
     {
     	this.inviteUsers = inviteUsers;
     }
+    
+    
+    
 }
